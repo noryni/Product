@@ -33,7 +33,9 @@
 │               ├── [1].lua
 │           ├── 13772394625.lua                          
 │           ├── Status.lua                                     
-│           ├── Version.lua │                           
+│           ├── Version.lua │ 
+├── Helper
+│   ├── Spy.lua
 ├── Loader (COMING SOON)
 │   ├── Crypter.lua
 │   ├── Run_Noryn.lua
