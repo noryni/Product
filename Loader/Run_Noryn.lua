@@ -1,1 +1,1 @@
-return 'Soon'
+print('Hello World!')
