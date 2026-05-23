@@ -1,5 +1,3 @@
---// [I am not the owner of this spy]
-
 if getgenv().SimpleSpyExecuted and type(getgenv().SimpleSpyShutdown) == "function" then
     getgenv().SimpleSpyShutdown()
 end
