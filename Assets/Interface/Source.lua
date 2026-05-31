@@ -575,8 +575,8 @@ function Library.new()
     Icon.BorderColor3 = Color3.fromRGB(0, 0, 0)
     Icon.BorderSizePixel = 0
     Icon.Position = UDim2.new(0.5, 0, 0.5, 0)
-    Icon.Size = UDim2.new(0, 35, 0, 35)
-    Icon.Image = 'rbxassetid://122209570435821'
+    Icon.Size = UDim2.new(0, 30, 0, 30)
+    Icon.Image = 'rbxassetid://81832374702537'
 
     if Device_Type == 'PC' then
         mobile_button.Visible = false
@@ -611,7 +611,7 @@ function Library.new()
         local Show_Tween_Info = TweenInfo.new(0.6, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut)
         TweenService:Create(mobile_button, Show_Tween_Info, {Size = UDim2.new(0, 85, 0, 38)}):Play()
         TweenService:Create(shadowMobile, Show_Tween_Info, {Size = UDim2.new(0, 100, 0, 58)}):Play()
-        TweenService:Create(Icon, Show_Tween_Info, {Size = UDim2.new(0, 35, 0, 35)}):Play()
+        TweenService:Create(Icon, Show_Tween_Info, {Size = UDim2.new(0, 30, 0, 30)}):Play()
     end
 
     UserInputService.InputBegan:Connect(function(input)
