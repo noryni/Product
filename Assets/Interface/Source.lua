@@ -22,9 +22,7 @@
  
 
 @ Noryn | © COPYRIGHT
---// Hey, before skidding read — LICENSE ✨.
-
-]]
+--// Hey, before skidding read — LICENSE ✨.]]
 
 if typeof(cloneref) ~= 'function' then return warn('[Noryn] - cloneref is not supported. ⚠️') end
 local UserInputService = cloneref(game:GetService('UserInputService'))
