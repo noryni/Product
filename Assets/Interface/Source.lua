@@ -450,7 +450,7 @@ function Library.new()
     mobile_button.TextColor3 = Color3.fromRGB(0, 0, 0)
     mobile_button.TextSize = 14.000
     mobile_button.Parent = container
-	mobile_button.ZIndex = 2
+	mobile_button.ZIndex = 3
     
 	if UserInputService.GamepadEnabled then
         Device_Type = 'Controller'
@@ -578,7 +578,7 @@ function Library.new()
     Icon.Position = UDim2.new(0.5, 0, 0.5, 0)
     Icon.Size = UDim2.new(0, 30, 0, 30)
     Icon.Image = 'rbxassetid://81832374702537'
-	Icon.ZIndex = 2
+	Icon.ZIndex = 3
 
     if Device_Type == 'PC' then
         mobile_button.Visible = false
