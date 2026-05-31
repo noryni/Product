@@ -667,18 +667,17 @@ function Library.new()
         end
     end)
 
-    UserInputService.InputBegan:Connect(function(input, Process)
-        if Process then return end
-        if not Library.exist() then return end
-        if getgenv().Keycode_Enabled == true then
-            if input.KeyCode == Enum.KeyCode.RightControl then
-                Library.visible(container)
-            end
-        else
-            if input.KeyCode == Enum.KeyCode.LeftControl or input.KeyCode == Enum.KeyCode.RightControl then
-                Library.visible(container)
-            end
-        end
+    getgenv().Interface_Keybind_Enabled = true
+	UserInputService.InputBegan:Connect(function(input, Processed)
+    	if Processed then return end
+    	if not Library.exist() then return end
+    	if not getgenv().Interface_Keybind_Enabled then return end
+    	if input.UserInputType ~= Enum.UserInputType.Keyboard then return end
+    	local Keybind = getgenv().Interface_Keybind
+    	local Noryn_Default = (input.KeyCode == Enum.KeyCode.LeftControl or input.KeyCode == Enum.KeyCode.RightControl)
+    	if (Keybind and input.KeyCode == Keybind) or (not Keybind and Noryn_Default) then
+        	Library.visible(container)
+    	end
 	end)
 
     mobile_button.MouseButton1Click:Connect(function()
