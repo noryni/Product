@@ -24,7 +24,7 @@
 @ Noryn | © COPYRIGHT
 --// Hey, before skidding read — LICENSE ✨.]]
 
-if typeof(cloneref) ~= 'function' then return warn('[Noryn] - cloneref is not supported. ⚠️') end
+if typeof(cloneref) ~= 'function' then return warn('[Product] ─ Dependency Issue. ✨') end
 local UserInputService = cloneref(game:GetService('UserInputService'))
 local TweenService = cloneref(game:GetService('TweenService'))
 local HttpService = cloneref(game:GetService('HttpService')) 
