@@ -259,7 +259,7 @@ function Library.new()
 	ContainerCorner.Parent = container.Container
 
 	local Top = Instance.new('ImageLabel')
-	Top.Name = 'Top'
+	Top.Name = 'Header'
 	Top.Parent = Container
 	Top.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 	Top.BackgroundTransparency = 1.000
