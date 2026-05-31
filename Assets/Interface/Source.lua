@@ -46,6 +46,11 @@ local Library = {
     Start_Position = nil;
 }
 
+Library.Default_Snapshot = {}
+for k,v in pairs(Library.Flags or {}) do
+    Library.Default_Snapshot[k] = v
+end
+
 local Noryn_Theme = getgenv().Tweaks_Enabled or {}
 local function Blur_Enabled() return Noryn_Theme.Blur == true end
 local function Blur_Size_Enabled() return tonumber(Noryn_Theme.Blur_Size) or 256 end
@@ -88,9 +93,11 @@ end
 
 function Library:save_flags()
     if not Library.exist() then return end
+    if getgenv().Save_Enabled == false then return end
+    local Path = `Noryn/Games/{game.GameId}.lua`
     local Flags = HttpService:JSONEncode(Library.Flags)
     if File_Support then
-        writefile(`Noryn/Games/{game.GameId}.lua`, Flags)
+        writefile(Path, Flags)
     else
         getgenv().Noryn_Flags = Flags
     end
@@ -1057,7 +1064,7 @@ function Library.new()
 
 			toggle.MouseButton1Click:Connect(function()
 				Library.Flags[self.flag] = not Library.Flags[self.flag]
-				Library.save_flags()
+				Library:save_flags()
 
 				Module.update_toggle({
 					state = Library.Flags[self.flag],
@@ -1197,7 +1204,7 @@ function Library.new()
 
 			toggle.MouseButton1Click:Connect(function()
 				Library.Flags[self.flag] = not Library.Flags[self.flag]
-				Library.save_flags()
+				Library:save_flags()
 
 				Module.update_toggle({
 					state = Library.Flags[self.flag],
@@ -1666,7 +1673,7 @@ function Library.new()
 			UserInputService.InputEnded:Connect(function(input: InputObject, process: boolean)
 				if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 					Library.Slider_Drag = false
-					Library.save_flags()
+					Library:save_flags()
 				end
 			end)
 		end
@@ -1881,7 +1888,7 @@ function Library.new()
 							dropdown.Box.TextLabel.Text = Library.Flags[self.flag]
 						end
 						self.callback(Library.Flags[self.flag])
-						Library.save_flags()
+						Library:save_flags()
 
 						Dropdown.select_option({
 							new_option = new_option,
@@ -2006,7 +2013,7 @@ function Library.new()
         	        if self.callback then
             	        self.callback(textbox.Box.TextHolder.Text)
         	        end
-        	    Library.save_flags()
+        	    Library:save_flags()
     	    end)
 
     	    function Textbox:update(text)
@@ -2101,7 +2108,7 @@ function Library.new()
 				if a.KeyCode.Name ~= 'Unknown' then
 					keybind.Box.TextLabel.Text = a.KeyCode.Name
 					Library.Flags[self.flag] = a.KeyCode.Name
-					Library.save_flags()
+					Library:save_flags()
 				end
 			end)
 
