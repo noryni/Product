@@ -440,8 +440,7 @@ function Library.new()
 
 	local tabsCorner = Instance.new('UICorner')
 	tabsCorner.Parent = tabs
-  
-    local TweenService = game:GetService('TweenService')
+
 
     local mobile_button = Instance.new('TextButton')
     mobile_button.Name = 'Mobile'
@@ -1615,7 +1614,7 @@ function Library.new()
 			TextLabel.BackgroundTransparency = 1.000
 			TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			TextLabel.BorderSizePixel = 0
-			TextLabel.Position = UDim2.new(0.414720833, 0, 0.375, 0)
+			TextLabel.Position = UDim2.new(0.42, 0, 0.375, 0)
 			TextLabel.Size = UDim2.new(0, 151, 0, 15)
 			TextLabel.ZIndex = 2
 			TextLabel.FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold)
@@ -1633,7 +1632,7 @@ function Library.new()
 			Number.BackgroundTransparency = 1.000
 			Number.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			Number.BorderSizePixel = 0
-			Number.Position = UDim2.new(0.854255736, 0, 0.375, 0)
+			Number.Position = UDim2.fromScale(0.85, 0.375)
 			Number.Size = UDim2.new(0, 38, 0, 15)
 			Number.ZIndex = 2
 			Number.FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold)
@@ -2119,6 +2118,547 @@ function Library.new()
 				end
 			end)
 		end
+
+		function Module:create_expandable_toggle(config)
+			local props = config
+			if type(props) ~= 'table' then
+				props = self
+			end
+
+			local section = props.section == 'left' and left_section or right_section
+
+			props.flag = props.flag or ('dsc.gg/getnoryn' .. tostring(math.random(10000,99999)))
+			if Library.Flags[props.flag] == nil then
+				Library.Flags[props.flag] = props.enabled or false
+			end
+
+			local open = Library.Flags[props.flag]
+			local container = Instance.new('Frame')
+			container.Parent = section
+			container.BackgroundColor3 = Color3.fromRGB(27, 28, 33)
+			container.BorderSizePixel = 0
+			container.Size = UDim2.new(0, 215, 0, 45)
+			container.ClipsDescendants = true
+
+			local corner = Instance.new('UICorner')
+			corner.CornerRadius = UDim.new(0, 10)
+			corner.Parent = container
+
+			local button = Instance.new('TextButton')
+			button.Parent = container
+			button.Size = UDim2.new(1, 0, 0, 45)
+			button.BackgroundTransparency = 1
+			button.Text = ''
+			button.AutoButtonColor = false
+
+			local Checkbox = Instance.new('Frame')
+			Checkbox.Name = 'Checkbox'
+			Checkbox.Parent = button
+			Checkbox.AnchorPoint = Vector2.new(0.5, 0.5)
+			Checkbox.BackgroundColor3 = Color3.fromRGB(22, 23, 27)
+			Checkbox.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			Checkbox.BorderSizePixel = 0
+			Checkbox.Position = UDim2.new(0.915000021, 0, 0.5, 0)
+			Checkbox.Size = UDim2.new(0, 17, 0, 17)
+
+			local UICorner_2 = Instance.new('UICorner')
+			UICorner_2.CornerRadius = UDim.new(0, 4)
+			UICorner_2.Parent = Checkbox
+
+			local Glow = Instance.new('ImageLabel')
+			Glow.Name = 'Glow'
+			Glow.Parent = Checkbox
+			Glow.AnchorPoint = Vector2.new(0.5, 0.5)
+			Glow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			Glow.BackgroundTransparency = 1.000
+			Glow.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			Glow.BorderSizePixel = 0
+			Glow.Position = UDim2.new(0.5, 0, 0.5, 0)
+			Glow.Size = UDim2.new(0, 27, 0, 27)
+			Glow.Image = 'rbxassetid://17290798394'
+			Glow.ImageTransparency = 1.000
+
+			local Checkmark = Instance.new('ImageLabel')
+			Checkmark.Name = 'Checkmark'
+			Checkmark.Parent = Checkbox
+			Checkmark.AnchorPoint = Vector2.new(0.5, 0.5)
+			Checkmark.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			Checkmark.BackgroundTransparency = 1.000
+			Checkmark.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			Checkmark.BorderSizePixel = 0
+			Checkmark.Position = UDim2.new(0.5, 0, 0.5, 0)
+			Checkmark.Size = UDim2.new(0, 15, 0, 15)
+			Checkmark.Image = 'rbxassetid://9754130783'
+			Checkmark.ImageTransparency = 1.000
+			Checkmark.ZIndex = 2
+
+			local Fill = Instance.new('Frame')
+			Fill.Name = 'Fill'
+			Fill.Parent = Checkbox
+			Fill.AnchorPoint = Vector2.new(0.5, 0.5)
+			Fill.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			Fill.BackgroundTransparency = 1.000
+			Fill.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			Fill.BorderSizePixel = 0
+			Fill.Position = UDim2.new(0.5, 0, 0.5, 0)
+			Fill.Size = UDim2.new(0, 17, 0, 17)
+
+			local UICorner_3 = Instance.new('UICorner')
+			UICorner_3.CornerRadius = UDim.new(0, 4)
+			UICorner_3.Parent = Fill
+
+			local UIGradient = Instance.new('UIGradient')
+			UIGradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(66, 89, 182)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(37, 57, 137))}
+			UIGradient.Rotation = 20
+			UIGradient.Parent = Fill
+
+			local TextLabel = Instance.new('TextLabel')
+			TextLabel.Parent = button
+			TextLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+			TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			TextLabel.BackgroundTransparency = 1.000
+			TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			TextLabel.BorderSizePixel = 0
+			TextLabel.Position = UDim2.new(0.449999988, 0, 0.400000036, 0)
+			TextLabel.Size = UDim2.new(0, 164, 0, 15)
+			TextLabel.ZIndex = 2
+			TextLabel.FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold)
+			TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+			TextLabel.TextScaled = true
+			TextLabel.TextSize = 14.000
+			TextLabel.TextWrapped = true
+			TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+			TextLabel.Text = props.name or ''
+
+			local DescriptionLabel = Instance.new('TextLabel')
+			DescriptionLabel.Parent = button
+			DescriptionLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+			DescriptionLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			DescriptionLabel.BackgroundTransparency = 1.000
+			DescriptionLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			DescriptionLabel.BorderSizePixel = 0
+			DescriptionLabel.Position = UDim2.new(0.449999988, 0, 0.700000048, 0)
+			DescriptionLabel.Size = UDim2.new(0, 164, 0, 10)
+			DescriptionLabel.ZIndex = 2
+			DescriptionLabel.FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold)
+			DescriptionLabel.TextColor3 = Color3.fromRGB(170, 170, 170)
+			DescriptionLabel.TextScaled = true
+			DescriptionLabel.TextSize = 14.000
+			DescriptionLabel.TextWrapped = true
+			DescriptionLabel.TextXAlignment = Enum.TextXAlignment.Left
+			DescriptionLabel.Text = props.description or ''
+
+			local body = Instance.new('Frame')
+			body.Name = 'Body'
+			body.Parent = container
+			body.BackgroundColor3 = Color3.fromRGB(22, 23, 27)
+			body.BorderSizePixel = 0
+			body.Position = UDim2.new(0, 0, 0, 45)
+			body.Size = UDim2.new(1, 0, 0, 0)
+			body.ClipsDescendants = true
+
+			local layout = Instance.new('UIListLayout')
+			layout.Parent = body
+			layout.Padding = UDim.new(0, 6)
+			layout.SortOrder = Enum.SortOrder.LayoutOrder
+			layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+			local padding = Instance.new('UIPadding')
+			padding.Parent = body
+			padding.PaddingTop = UDim.new(0, 8)
+			padding.PaddingLeft = UDim.new(0, 0)
+			padding.PaddingRight = UDim.new(0, 0)
+			padding.PaddingBottom = UDim.new(0, 8)
+
+			local body_height = 0
+			local function update_body_height()
+				body_height = 16 
+				for _, child in pairs(body:GetChildren()) do
+					if child:IsA('GuiObject') and child.Name ~= 'UIListLayout' and child.Name ~= 'UIPadding' then
+						body_height = body_height + child.Size.Y.Offset + 6  
+					end
+				end return body_height
+			end
+			local function enable_checkbox()
+				TweenService:Create(Fill, TweenInfo.new(0.4), {
+					BackgroundTransparency = 0
+				}):Play()
+
+				TweenService:Create(Glow, TweenInfo.new(0.4), {
+					ImageTransparency = 0
+				}):Play()
+
+				TweenService:Create(Checkmark, TweenInfo.new(0.4), {
+					ImageTransparency = 0
+				}):Play()
+			end
+
+			local function disable_checkbox()
+				TweenService:Create(Fill, TweenInfo.new(0.4), {
+					BackgroundTransparency = 1
+				}):Play()
+
+				TweenService:Create(Glow, TweenInfo.new(0.4), {
+					ImageTransparency = 1
+				}):Play()
+
+				TweenService:Create(Checkmark, TweenInfo.new(0.4), {
+					ImageTransparency = 1
+				}):Play()
+			end
+
+			if open then
+				enable_checkbox()
+			end
+
+			button.MouseButton1Click:Connect(function()
+				open = not open
+				Library.Flags[props.flag] = open
+
+				if open then
+					enable_checkbox()
+					update_body_height()
+					container:TweenSize(UDim2.new(0, 215, 0, 45 + body_height), 'Out', 'Quad', 0.2, true)
+					body:TweenSize(UDim2.new(1, 0, 0, body_height), 'Out', 'Quad', 0.2, true)
+					if props.callback then props.callback(true) end
+				else
+					disable_checkbox()
+					container:TweenSize(UDim2.new(0, 215, 0, 45), 'Out', 'Quad', 0.2, true)
+					body:TweenSize(UDim2.new(1, 0, 0, 0), 'Out', 'Quad', 0.2, true)
+					if props.callback then props.callback(false) end
+				end
+
+				Library:save_flags()
+			end)
+
+			local ExpandableModule = {}
+
+			local function section_call(fn, config)
+				local previous_left, previous_right = left_section, right_section
+				left_section, right_section = body, body
+				local result = fn(config)
+				left_section, right_section = previous_left, previous_right
+				return result
+			end
+
+			function ExpandableModule:create_toggle(config)
+				if type(config) ~= 'table' then return end
+				return section_call(Module.create_toggle, config)
+			end
+
+			function ExpandableModule:create_description_toggle(config)
+				if type(config) ~= 'table' then return end
+				return section_call(Module.create_description_toggle, config)
+			end
+
+			function ExpandableModule:create_dropdown(config)
+				if type(config) ~= 'table' then return end
+				return section_call(Module.create_dropdown, config)
+			end
+
+			function ExpandableModule:create_button(config)
+				if type(config) ~= 'table' then return end
+				return section_call(Module.create_button, config)
+			end
+
+			function ExpandableModule:create_description_button(config)
+				if type(config) ~= 'table' then return end
+				return section_call(Module.create_description_button, config)
+			end
+
+			function ExpandableModule:create_paragraph(config)
+				if type(config) ~= 'table' then return end
+				return section_call(Module.create_paragraph, config)
+			end
+
+			function ExpandableModule:create_textbox(config)
+				if type(config) ~= 'table' then return end
+				return section_call(Module.create_textbox, config)
+			end
+
+			function ExpandableModule:create_keybind(config)
+				if type(config) ~= 'table' then return end
+				return section_call(Module.create_keybind, config)
+			end
+
+			function ExpandableModule:create_image(config)
+				if type(config) ~= 'table' then return end
+				return section_call(Module.create_image, config)
+			end
+
+			function ExpandableModule:create_verified(config)
+				if type(config) ~= 'table' then return end
+				return section_call(Module.create_verified, config)
+			end
+
+			function ExpandableModule:create_line(config)
+				if type(config) ~= 'table' then return end
+				return section_call(Module.create_line, config)
+			end
+
+			function ExpandableModule:update_slider(slider_config)
+				local Result = math.clamp((Get_Mouse.X - slider_config.slider.Box.AbsolutePosition.X) / slider_config.slider.Box.AbsoluteSize.X, 0, 1)
+				if not Result then return end
+
+				local step = slider_config.step or 0.1
+				local Step_Divider = 1 / step
+				local Number = math.floor((((slider_config.maximum_value - slider_config.minimum_value) * Result) + slider_config.minimum_value) * Step_Divider) / Step_Divider
+				local Slider_Size = math.clamp(Result, 0.001, 0.999)
+
+				slider_config.slider.Box.Fill.UIGradient.Transparency = NumberSequence.new({
+					NumberSequenceKeypoint.new(0, 0),
+					NumberSequenceKeypoint.new(Slider_Size, 0),
+					NumberSequenceKeypoint.new(math.min(Slider_Size + 0.001, 1), 1),
+					NumberSequenceKeypoint.new(1, 1)
+				})
+
+				slider_config.slider.Box.Glow.UIGradient.Transparency = NumberSequence.new({
+					NumberSequenceKeypoint.new(0, 0),
+					NumberSequenceKeypoint.new(Slider_Size, 0),
+					NumberSequenceKeypoint.new(math.min(Slider_Size + 0.03, 1), 1),
+					NumberSequenceKeypoint.new(1, 1)
+				})
+
+				Library.Flags[slider_config.flag] = Number
+				slider_config.slider.Number.Text = Number
+				slider_config.callback(Number)
+			end
+
+			function ExpandableModule:slider_loop(slider_config)
+				Library.Slider_Drag = true
+				
+				while Library.Slider_Drag do
+					ExpandableModule:update_slider(slider_config)
+					task.wait()
+				end
+			end
+
+			function ExpandableModule:create_slider(config)
+				local slider = Instance.new('TextButton')
+				slider.Name = 'Slider'
+				slider.BackgroundColor3 = Color3.fromRGB(27, 28, 33)
+				slider.BorderColor3 = Color3.fromRGB(0, 0, 0)
+				slider.BorderSizePixel = 0
+				slider.Size = UDim2.new(0, 215, 0, 48)
+				slider.AutoButtonColor = false
+				slider.Font = Enum.Font.SourceSans
+				slider.Text = ''
+				slider.TextColor3 = Color3.fromRGB(0, 0, 0)
+				slider.TextSize = 14.000
+				slider.Parent = body
+
+				local UICorner = Instance.new('UICorner')
+				UICorner.CornerRadius = UDim.new(0, 10)
+				UICorner.Parent = slider
+
+				local Box = Instance.new('Frame')
+				Box.Name = 'Box'
+				Box.Parent = slider
+				Box.AnchorPoint = Vector2.new(0.5, 0.5)
+				Box.BackgroundColor3 = Color3.fromRGB(22, 23, 27)
+				Box.BorderColor3 = Color3.fromRGB(0, 0, 0)
+				Box.BorderSizePixel = 0
+				Box.Position = UDim2.new(0.508023143, 0, 0.708333313, 0)
+				Box.Size = UDim2.new(0, 192, 0, 6)
+
+				local UICorner_2 = Instance.new('UICorner')
+				UICorner_2.CornerRadius = UDim.new(0, 15)
+				UICorner_2.Parent = Box
+
+				local Glow = Instance.new('ImageLabel')
+				Glow.Name = 'Glow'
+				Glow.Parent = Box
+				Glow.AnchorPoint = Vector2.new(0.5, 0.5)
+				Glow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+				Glow.BackgroundTransparency = 1.000
+				Glow.BorderColor3 = Color3.fromRGB(0, 0, 0)
+				Glow.BorderSizePixel = 0
+				Glow.Position = UDim2.new(0.5, 0, 0.5, 0)
+				Glow.Size = UDim2.new(0, 204, 0, 17)
+				Glow.ZIndex = 2
+				Glow.Image = 'rbxassetid://17381990533'
+
+				local UIGradient = Instance.new('UIGradient')
+				UIGradient.Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0.00, 0.00), NumberSequenceKeypoint.new(0.50, 0.00), NumberSequenceKeypoint.new(0.53, 1.00), NumberSequenceKeypoint.new(1.00, 1.00)}
+				UIGradient.Parent = Glow
+
+				local Fill = Instance.new('ImageLabel')
+				Fill.Name = 'Fill'
+				Fill.Parent = Box
+				Fill.AnchorPoint = Vector2.new(0, 0.5)
+				Fill.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+				Fill.BackgroundTransparency = 1.000
+				Fill.BorderColor3 = Color3.fromRGB(0, 0, 0)
+				Fill.BorderSizePixel = 0
+				Fill.Position = UDim2.new(0, 0, 0.5, 0)
+				Fill.Size = UDim2.new(1, 0, 1, 0)
+				Fill.Image = 'rbxassetid://17382033116'
+
+				local UICorner_3 = Instance.new('UICorner')
+				UICorner_3.CornerRadius = UDim.new(0, 4)
+				UICorner_3.Parent = Fill
+
+				local UIGradient_2 = Instance.new('UIGradient')
+				UIGradient_2.Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0.00, 0.00), NumberSequenceKeypoint.new(0.50, 0.00), NumberSequenceKeypoint.new(0.50, 1.00), NumberSequenceKeypoint.new(1.00, 1.00)}
+				UIGradient_2.Parent = Fill
+				
+				local Hitbox = Instance.new('TextButton')
+				Hitbox.Name = 'Hitbox'
+				Hitbox.Parent = Box
+				Hitbox.AnchorPoint = Vector2.new(0.5, 0.5)
+				Hitbox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+				Hitbox.BackgroundTransparency = 1.000
+				Hitbox.BorderColor3 = Color3.fromRGB(0, 0, 0)
+				Hitbox.BorderSizePixel = 0
+				Hitbox.Position = UDim2.new(0.5, 0, 0.5, 0)
+				Hitbox.Size = UDim2.new(0, 200, 0, 13)
+				Hitbox.ZIndex = 3
+				Hitbox.AutoButtonColor = false
+				Hitbox.Font = Enum.Font.SourceSans
+				Hitbox.Text = ''
+				Hitbox.TextColor3 = Color3.fromRGB(0, 0, 0)
+				Hitbox.TextSize = 14.000
+
+				local TextLabel = Instance.new('TextLabel')
+				TextLabel.Parent = slider
+				TextLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+				TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+				TextLabel.BackgroundTransparency = 1.000
+				TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+				TextLabel.BorderSizePixel = 0
+				TextLabel.Position = UDim2.new(0.35, 0, 0.375, 0)
+				TextLabel.Size = UDim2.new(0, 120, 0, 15)
+				TextLabel.ZIndex = 2
+				TextLabel.FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold)
+				TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+				TextLabel.TextScaled = true
+				TextLabel.TextSize = 14.000
+				TextLabel.TextWrapped = true
+				TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+				local Number = Instance.new('TextLabel')
+				Number.Name = 'Number'
+				Number.Parent = slider
+				Number.AnchorPoint = Vector2.new(0.5, 0.5)
+				Number.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+				Number.BackgroundTransparency = 1.000
+				Number.BorderColor3 = Color3.fromRGB(0, 0, 0)
+				Number.BorderSizePixel = 0
+				Number.Position = UDim2.new(0.85, 0, 0.375, 0)
+				Number.Size = UDim2.new(0, 38, 0, 15)
+				Number.ZIndex = 2
+				Number.FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold)
+				Number.TextColor3 = Color3.fromRGB(255, 255, 255)
+				Number.TextScaled = true
+				Number.TextSize = 14.000
+				Number.TextWrapped = true
+				Number.TextXAlignment = Enum.TextXAlignment.Right
+
+				TextLabel.Text = config.name
+				Number.Text = config.value
+
+				if not Library.Flags[config.flag] then
+					Library.Flags[config.flag] = config.value
+				end
+
+				slider.Number.Text = Library.Flags[config.flag]
+				config.callback(Library.Flags[config.flag])
+
+				slider.Box.Hitbox.MouseButton1Down:Connect(function()
+					if Library.Slider_Drag then
+						return
+					end
+
+					ExpandableModule:slider_loop({
+						slider = slider,
+						flag = config.flag,
+						callback = config.callback,
+						step = config.step,
+						maximum_value = config.maximum_value,
+						minimum_value = config.minimum_value,
+					})
+				end)
+				
+				UserInputService.InputEnded:Connect(function(input: InputObject, process: boolean)
+					if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+						Library.Slider_Drag = false
+						Library:save_flags()
+						update_body_height()
+						if open then
+							container:TweenSize(UDim2.new(0, 215, 0, 45 + body_height), 'Out', 'Quad', 0.1, true)
+							body:TweenSize(UDim2.new(1, 0, 0, body_height), 'Out', 'Quad', 0.1, true)
+						end
+					end
+				end)
+
+				task.wait(0.05)
+				update_body_height()
+				if open then
+					container:TweenSize(UDim2.new(0, 215, 0, 45 + body_height), 'Out', 'Quad', 0.1, true)
+					body:TweenSize(UDim2.new(1, 0, 0, body_height), 'Out', 'Quad', 0.1, true)
+				end
+			end
+
+			return {
+				get = function()
+					return open
+				end,
+				set = function(_, toggled)
+					if toggled ~= open then
+						button:MouseButton1Click()
+					end
+				end,
+				create_toggle = function(self, config)
+					config = config or self
+					return ExpandableModule:create_toggle(config)
+				end,
+				create_description_toggle = function(self, config)
+					config = config or self
+					return ExpandableModule:create_description_toggle(config)
+				end,
+				create_dropdown = function(self, config)
+					config = config or self
+					return ExpandableModule:create_dropdown(config)
+				end,
+				create_button = function(self, config)
+					config = config or self
+					return ExpandableModule:create_button(config)
+				end,
+				create_description_button = function(self, config)
+					config = config or self
+					return ExpandableModule:create_description_button(config)
+				end,
+				create_paragraph = function(self, config)
+					config = config or self
+					return ExpandableModule:create_paragraph(config)
+				end,
+				create_textbox = function(self, config)
+					config = config or self
+					return ExpandableModule:create_textbox(config)
+				end,
+				create_keybind = function(self, config)
+					config = config or self
+					return ExpandableModule:create_keybind(config)
+				end,
+				create_image = function(self, config)
+					config = config or self
+					return ExpandableModule:create_image(config)
+				end,
+				create_verified = function(self, config)
+					config = config or self
+					return ExpandableModule:create_verified(config)
+				end,
+				create_line = function(self, config)
+					config = config or self
+					return ExpandableModule:create_line(config)
+				end,
+				create_slider = function(self, config)
+					config = config or self
+					return ExpandableModule:create_slider(config)
+				end
+			}
+		end
+
         return Module
     end
     return Tab
