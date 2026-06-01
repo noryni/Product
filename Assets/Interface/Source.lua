@@ -422,11 +422,28 @@ function Library.new()
 	tabs.BackgroundTransparency = 1.000
 	tabs.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	tabs.BorderSizePixel = 0
-	tabs.Position = UDim2.new(0, 0, 0.0915492922, 0)
-	tabs.Size = UDim2.new(0, 209, 0, 386)
+	tabs.Position = UDim2.new(0, 0, 0, 90)
+	tabs.Size = UDim2.new(0, 209, 0, 296)
 	tabs.ScrollBarImageColor3 = Color3.fromRGB(0, 0, 0)
 	tabs.ScrollBarThickness = 0
     tabs.Parent = container.Container
+
+	local LogoHolder = Instance.new("Frame")
+	LogoHolder.Name = "LogoHolder"
+	LogoHolder.Parent = Container
+	LogoHolder.BackgroundTransparency = 1
+	LogoHolder.Position = UDim2.new(0, 0, 0.0915, 0)
+	LogoHolder.Size = UDim2.new(0, 209, 0, 80)
+
+	local SideLogo = Instance.new("ImageLabel")
+	SideLogo.Name = "SideLogo"
+	SideLogo.Parent = LogoHolder
+	SideLogo.BackgroundTransparency = 1
+	SideLogo.AnchorPoint = Vector2.new(0.5, 0.5)
+	SideLogo.Position = UDim2.new(0.0500000007, 95, 0.400000006, 0)
+	SideLogo.Size = UDim2.new(0, 200, 0, 150)
+
+	SideLogo.Image = "rbxassetid://115967977256317"
 
 	local tabslist = Instance.new('UIListLayout')
 	tabslist.Parent = tabs
@@ -440,7 +457,6 @@ function Library.new()
 
 	local tabsCorner = Instance.new('UICorner')
 	tabsCorner.Parent = tabs
-
 
     local mobile_button = Instance.new('TextButton')
     mobile_button.Name = 'Mobile'
@@ -2272,7 +2288,7 @@ function Library.new()
 
 			local body_height = 0
 			local function update_body_height()
-				body_height = 16 
+				body_height = 10
 				for _, child in pairs(body:GetChildren()) do
 					if child:IsA('GuiObject') and child.Name ~= 'UIListLayout' and child.Name ~= 'UIPadding' then
 						body_height = body_height + child.Size.Y.Offset + 6  
