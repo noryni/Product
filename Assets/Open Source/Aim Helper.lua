@@ -37,7 +37,7 @@ local Current_Config = Settings.Current_Config
 if not Current_Config then
 	local Current_Config = {
     	Aim_Helper_Enabled = true,
-    	Aim_Helper_Accuracy = '100%',
+    	Aim_Helper_Accuracy = '80%',
    	 	Aim_Helper_Target_Part = 'HumanoidRootPart',
 
     	Target_Closest_Distance_Check = 5,
@@ -54,7 +54,7 @@ if not Current_Config then
     	X_Offset = 0,
 
     	Trigger_Bot = true,
-    	Trigger_Bot_Accuracy = '100%', 
+    	Trigger_Bot_Accuracy = '70%', 
     	Trigger_Bot_Detection_Delay = 0.001, 
 
     	Resolver_Enabled = true,
@@ -272,7 +272,7 @@ Settings.Fov_Thickness = math.clamp(Current_Config.Fov_Thickness or 1, 0.1, 5)
 Settings.Fov_Transparency = Current_Config.Fov_Transparency
 Settings.Fov_Color = Color3.fromRGB(173, 164, 207)
 
-Settings.Target_Closest_Distance_Check = math.max(Current_Config.Target_Closest_Distance_Check or 20, 0)
+Settings.Target_Closest_Distance_Check = math.max(Current_Config.Target_Closest_Distance_Check or 5, 0)
 
 Settings.Hitbox_Mode = tostring(Current_Config.Hitbox_Mode or 'Target')
 Settings.Hitbox_Size = math.clamp(Current_Config.Hitbox_Size or 3, 3, 50)
