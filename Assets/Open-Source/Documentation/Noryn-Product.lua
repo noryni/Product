@@ -214,4 +214,32 @@
 │ release acts as a milestone design verification platform showcasing the stability, 
 │ modular code formatting, and architecture under development for upcoming 
 │ Noryn production ecosystems.
+│
+├─ 🔍 SECURITY NOTE & DETECTION MITIGATION ────────────────────────────────
+│
+│ 🎥 Direct CFrame Correction
+│ • Targeting functions lock coordinates by interacting directly with:
+│       Workspace.CurrentCamera.CFrame
+│ • Server-side anti-cheats tracking fine-grain angular velocity vectors may 
+│   flag repetitive or immediate camera adjustments during high-velocity snaps.
+│
+│ 🖼️ Drawing API FOOTPRINT
+│ • Running standard FOV configurations invokes Drawing.new('Circle'). 
+│ • To bypass runtime scanning routines looking for active external overlay hooks, 
+│   utilize the 'Safety_Fov_Enabled' parameter to lock geometry fields while 
+│   suppressing all visual draws completely.
+│
+│ 🖱️ Simulated Input Callbacks
+│ • Trigger Bot components communicate simulated player click triggers via:
+│   - VirtualInputManager:SendMouseButtonEvent()
+│
+│ • Certain advanced engine instances actively reject or flag synthetic events
+│   - originating from system contexts outside native user hardware layers.
+│
+│ 📦 Humanoid Part Modifiers
+│ • Adjusting Hitbox dimensions temporarily forces modifications on:
+│   - Size, Transparency, Color, Material, and CanCollide properties.
+│ • Aggressive values can trigger physics sync issues, internal engine exception 
+│   - errors, or baseline integrity check flags depending on server settings.
+│
 ╰──────────────────────────────────────────────────────────────────────────╯]]
