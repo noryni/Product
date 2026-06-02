@@ -1940,7 +1940,7 @@ function Library.new()
             image.Parent = section
             image.AnchorPoint = Vector2.new(0.5, 0.5) 
             image.Position = UDim2.new(0.5, 0, 0.5, 0) 
-            image.Size = UDim2.new(0, 215, 0, 120)  
+            image.Size = UDim2.new(0, 215, 0, 147)  
             image.BackgroundTransparency = 1
 
             image.Image = self.image
