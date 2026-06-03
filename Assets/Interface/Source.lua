@@ -17,9 +17,7 @@
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣾⣿⣿⡄⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⡄⠈⣿⣿⡿⠀⡀⣿⣷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢙⠻⣿⣿⢀⠙⠻⠿⣿⣿⣿⣿⣿⣿⡇⠁⣿⠟⡀⠈⣧⢰⣿⠆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠿⠴⠮⣥⠻⢧⣤⣄⣀⡉⢩⣭⣍⣃⣀⣩⠎⢀⣼⠉⣼⡯⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⠁⣛⠓⢒⣒⣢⡭⢁⡈⠿⠿⠟⠹⠛⠁⠀⠀⠀⠰⠃⠂⠀⠀⠀
-
- 
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⠁⣛⠓⢒⣒⣢⡭⢁⡈⠿⠿⠟⠹⠛⠁⠀⠀⠀⠰⠃⠂⠀⠀⠀⠀⠀⠀
 
 @ Noryn | © COPYRIGHT
 --// Hey, before skidding read — LICENSE ✨.]]
@@ -33,7 +31,8 @@ local CoreGui = cloneref(game:GetService('CoreGui'))
 local Players = cloneref(game:GetService('Players'))
 
 local LocalPlayer = Players.LocalPlayer
-local Get_Mouse = LocalPlayer:GetMouse();
+local Local_Mouse = LocalPlayer:GetMouse();
+local Camera = Workspace.CurrentCamera
 
 local Library = {
 	Connections = {};
@@ -125,81 +124,73 @@ function Library:load_flags()
 end
 
 Library.load_flags()
+if getgenv().Save_Enabled == false then
+    for _, v in ipairs(Camera:GetChildren()) do
+        if v:IsA('BlurEffect') or v:IsA('ColorCorrectionEffect') then
+            v:Destroy()
+        end
+    end
+    Color_Effect_Enabled = nil
+    Blur_Effect_Enabled = nil
+end
 Library.clear()
 
 function Library:open()
+    self.Container.Visible = true
+    self.Shadow.Visible = true
+    self.Mobile.Modal = true
+
     if Color_Correction_Enabled() then
-        if not Color_Effect_Enabled then
-            Color_Effect_Enabled = Instance.new('ColorCorrectionEffect', Workspace.CurrentCamera)
-            if not Is_Mobile then
-                Color_Effect_Enabled.Saturation = 0
-            end
-        end
-        TweenService:Create(
-            Color_Effect_Enabled,
-            TweenInfo.new(0.65, Enum.EasingStyle.Exponential, Enum.EasingDirection.InOut),
-            { Saturation = Color_Saturation_Enabled() }
-        ):Play()
+        Color_Effect_Enabled = Camera:FindFirstChildOfClass('ColorCorrectionEffect') or Instance.new('ColorCorrectionEffect', Camera)
+        TweenService:Create(Color_Effect_Enabled, TweenInfo.new(0.45, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), { 
+            Saturation = Color_Saturation_Enabled() 
+        }):Play()
     end
-    if Blur_Enabled() then
-        if not Blur_Effect_Enabled then
-            Blur_Effect_Enabled = Instance.new('BlurEffect', Workspace.CurrentCamera)
-            if not Is_Mobile then
-                Blur_Effect_Enabled.Size = 0
-            end
-        end
-        TweenService:Create(
-            Blur_Effect_Enabled,
-            TweenInfo.new(0.65, Enum.EasingStyle.Exponential, Enum.EasingDirection.InOut),
-            { Size = Blur_Size_Enabled() }
-        ):Play()
-    end
-
-	self.Container.Visible = true
-	self.Shadow.Visible = true
-	self.Mobile.Modal = true
     
-	TweenService:Create(self.Container, TweenInfo.new(0.6, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut), {
-		Size = UDim2.new(0, 699, 0, 426)
-	}):Play()
+    if Blur_Enabled() then
+        Blur_Effect_Enabled = Camera:FindFirstChildOfClass('BlurEffect') or Instance.new('BlurEffect', Camera)
+        TweenService:Create(Blur_Effect_Enabled, TweenInfo.new(0.45, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), { 
+            Size = Blur_Size_Enabled() 
+        }):Play()
+    end
 
-	TweenService:Create(self.Shadow, TweenInfo.new(0.6, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut), {
-		Size = UDim2.new(0, 776, 0, 509)
-	}):Play()
+    TweenService:Create(self.Container, TweenInfo.new(0.45, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+        Size = UDim2.new(0, 699, 0, 426)
+    }):Play()
+
+    TweenService:Create(self.Shadow, TweenInfo.new(0.45, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+        Size = UDim2.new(0, 776, 0, 509)
+    }):Play()
 end
 
 function Library:close()
     if Color_Effect_Enabled then
-        TweenService:Create(
-            Color_Effect_Enabled,
-            TweenInfo.new(0.65, Enum.EasingStyle.Exponential, Enum.EasingDirection.InOut),
-            { Saturation = 0 }
-        ):Play()
+        TweenService:Create(Color_Effect_Enabled, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { 
+            Saturation = 0 
+        }):Play()
     end
 
     if Blur_Effect_Enabled then
-        TweenService:Create(
-            Blur_Effect_Enabled,
-            TweenInfo.new(0.65, Enum.EasingStyle.Exponential, Enum.EasingDirection.InOut),
-            { Size = 0 }
-        ):Play()
+        TweenService:Create(Blur_Effect_Enabled, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { 
+            Size = 0 
+        }):Play()
     end
-    
-	TweenService:Create(self.Shadow, TweenInfo.new(0.6, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut), {
-		Size = UDim2.new(0, 0, 0, 0)
-	}):Play()
 
-	local Main = TweenService:Create(self.Container, TweenInfo.new(0.6, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut), {
-		Size = UDim2.new(0, 0, 0, 0)
-	})
+    TweenService:Create(self.Shadow, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+        Size = UDim2.new(0, 0, 0, 0)
+    }):Play()
 
-	Main:Play()
-	Main.Completed:Once(function()
-		if Library.enabled then return end
-		self.Container.Visible = false
-		self.Shadow.Visible = false
-		self.Mobile.Modal = false
-	end)
+    local Main = TweenService:Create(self.Container, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+        Size = UDim2.new(0, 0, 0, 0)
+    })
+
+    Main:Play()
+    Main.Completed:Once(function()
+        if Library.enabled then return end
+        self.Container.Visible = false
+        self.Shadow.Visible = false
+        self.Mobile.Modal = false
+    end)
 end
 
 function Library:drag()
@@ -285,7 +276,7 @@ function Library.new()
     Logo.BorderSizePixel = 0
     Logo.Position = UDim2.new(0.950000048, 0, 0.5, 0)
     Logo.Size = UDim2.new(0, 20, 0, 20)
-    Logo.Image = 'rbxassetid://110130056211155'
+    Logo.Image = ''
 	Logo.ImageTransparency = 1
 	
 	local TextLabel = Instance.new('TextLabel')
@@ -323,18 +314,18 @@ function Library.new()
   	TextLabel.TextXAlignment = Enum.TextXAlignment.Center
   	TextLabel.TextTransparency = 0
 
-	local Cat = Instance.new('ImageLabel')
-    Cat.Name = 'Cat'
-    Cat.Parent = Top
-    Cat.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    Cat.BackgroundTransparency = 1.000
-    Cat.BorderColor3 = Color3.fromRGB(0, 0, 0)
-    Cat.BorderSizePixel = 0
-    Cat.Position = UDim2.new(0.930000007, 0, 0.200000003, 0)
-    Cat.Size = UDim2.new(0, 25, 0, 25)
-    Cat.ZIndex = 3
-    Cat.Image = 'rbxassetid://74080484918102'
-    Cat.ImageRectSize = Vector2.new(20, 20)
+	local Cat_Gif = Instance.new('ImageLabel')
+    Cat_Gif.Name = 'Cat Gif'
+    Cat_Gif.Parent = Top
+    Cat_Gif.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    Cat_Gif.BackgroundTransparency = 1.000
+    Cat_Gif.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    Cat_Gif.BorderSizePixel = 0
+    Cat_Gif.Position = UDim2.new(0.930000007, 0, 0.200000003, 0)
+    Cat_Gif.Size = UDim2.new(0, 25, 0, 25)
+    Cat_Gif.ZIndex = 3
+    Cat_Gif.Image = 'rbxassetid://74080484918102'
+    Cat_Gif.ImageRectSize = Vector2.new(20, 20)
 
     local function Animation(ImageLabel, Sprite_Width, Sprite_Height, Rows, Columns, Frame_Count, Image_Id, FPS)
     if Image_Id then ImageLabel.Image = Image_Id end
@@ -377,7 +368,7 @@ function Library.new()
         end)
     end
     
-    Animation(Cat, 60, 40, 2, 3, 5, 'rbxassetid://74080484918102', 10)
+    Animation(Cat_Gif, 60, 40, 2, 3, 5, 'rbxassetid://74080484918102', 10)
 
     local Start_Time = os.time()
     local function Format_Time(Seconds)
@@ -415,64 +406,64 @@ function Library.new()
     Line.Position = UDim2.new(0.296137333, 0, 0.0915492922, 0)
     Line.Size = UDim2.new(0, 2, 0, 387)
 
-    local tabs = Instance.new('ScrollingFrame')
-	tabs.Name = 'Tabs'
-	tabs.Active = true
-	tabs.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	tabs.BackgroundTransparency = 1.000
-	tabs.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	tabs.BorderSizePixel = 0
-	tabs.Position = UDim2.new(0, 0, 0, 90)
-	tabs.Size = UDim2.new(0, 209, 0, 296)
-	tabs.ScrollBarImageColor3 = Color3.fromRGB(0, 0, 0)
-	tabs.ScrollBarThickness = 0
-    tabs.Parent = container.Container
+    local Tabs = Instance.new('ScrollingFrame')
+	Tabs.Name = 'Tabs'
+	Tabs.Active = true
+	Tabs.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Tabs.BackgroundTransparency = 1.000
+	Tabs.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Tabs.BorderSizePixel = 0
+	Tabs.Position = UDim2.new(0, 0, 0, 90)
+	Tabs.Size = UDim2.new(0, 209, 0, 296)
+	Tabs.ScrollBarImageColor3 = Color3.fromRGB(0, 0, 0)
+	Tabs.ScrollBarThickness = 0
+    Tabs.Parent = container.Container
 
-	local LogoHolder = Instance.new("Frame")
-	LogoHolder.Name = "LogoHolder"
-	LogoHolder.Parent = Container
-	LogoHolder.BackgroundTransparency = 1
-	LogoHolder.Position = UDim2.new(0, 0, 0.0915, 0)
-	LogoHolder.Size = UDim2.new(0, 209, 0, 80)
+	local Noryn_Logo = Instance.new('Frame')
+	Noryn_Logo.Name = 'Noryn Logo'
+	Noryn_Logo.Parent = Container
+	Noryn_Logo.BackgroundTransparency = 1
+	Noryn_Logo.Position = UDim2.new(0, 0, 0.0915, 0)
+	Noryn_Logo.Size = UDim2.new(0, 209, 0, 80)
 
-	local SideLogo = Instance.new("ImageLabel")
-	SideLogo.Name = "SideLogo"
-	SideLogo.Parent = LogoHolder
-	SideLogo.BackgroundTransparency = 1
-	SideLogo.AnchorPoint = Vector2.new(0.5, 0.5)
-	SideLogo.Position = UDim2.new(0.0500000007, 95, 0.400000006, 0)
-	SideLogo.Size = UDim2.new(0, 200, 0, 150)
+	local Side_Logo = Instance.new('ImageLabel')
+	Side_Logo.Name = 'Side Logo'
+	Side_Logo.Parent = Noryn_Logo
+	Side_Logo.BackgroundTransparency = 1
+	Side_Logo.AnchorPoint = Vector2.new(0.5, 0.5)
+	Side_Logo.Position = UDim2.new(0.0500000007, 95, 0.400000006, 0)
+	Side_Logo.Size = UDim2.new(0, 200, 0, 150)
 
-	SideLogo.Image = "rbxassetid://115967977256317"
+	Side_Logo.Image = 'rbxassetid://115967977256317'
 
-	local tabslist = Instance.new('UIListLayout')
-	tabslist.Parent = tabs
-	tabslist.HorizontalAlignment = Enum.HorizontalAlignment.Center
-	tabslist.SortOrder = Enum.SortOrder.LayoutOrder
-	tabslist.Padding = UDim.new(0, 9)
+	local Tabs_List = Instance.new('UIListLayout')
+	Tabs_List.Parent = Tabs
+	Tabs_List.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	Tabs_List.SortOrder = Enum.SortOrder.LayoutOrder
+	Tabs_List.Padding = UDim.new(0, 9)
 
 	local UIPadding = Instance.new('UIPadding')
-	UIPadding.Parent = tabs
+	UIPadding.Parent = Tabs
 	UIPadding.PaddingTop = UDim.new(0, 15)
 
-	local tabsCorner = Instance.new('UICorner')
-	tabsCorner.Parent = tabs
+	local Tabs_Corner = Instance.new('UICorner')
+	Tabs_Corner.Parent = Tabs
 
-    local mobile_button = Instance.new('TextButton')
-    mobile_button.Name = 'Mobile'
-    mobile_button.BackgroundColor3 = Color3.fromRGB(27, 28, 33)
-    mobile_button.BorderColor3 = Color3.fromRGB(0, 0, 0)
-    mobile_button.BorderSizePixel = 0
-    mobile_button.Position = UDim2.new(0.5, -300, 0.8, 33)
-    mobile_button.Size = UDim2.new(0, 85, 0, 38)
-    mobile_button.AutoButtonColor = false
-    mobile_button.Modal = true
-    mobile_button.FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold)
-    mobile_button.Text = ''
-    mobile_button.TextColor3 = Color3.fromRGB(0, 0, 0)
-    mobile_button.TextSize = 14.000
-    mobile_button.Parent = container
-	mobile_button.ZIndex = 3
+    local Mobile_Button = Instance.new('TextButton')
+    Mobile_Button.Name = 'Mobile'
+    Mobile_Button.BackgroundColor3 = Color3.fromRGB(27, 28, 33)
+    Mobile_Button.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    Mobile_Button.BorderSizePixel = 0
+    Mobile_Button.Position = UDim2.new(0.5, -300, 0.8, 33)
+    Mobile_Button.Size = UDim2.new(0, 85, 0, 38)
+    Mobile_Button.AutoButtonColor = false
+    Mobile_Button.Modal = true
+    Mobile_Button.FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold)
+    Mobile_Button.Text = ''
+    Mobile_Button.TextColor3 = Color3.fromRGB(0, 0, 0)
+    Mobile_Button.TextSize = 14.000
+    Mobile_Button.Parent = container
+	Mobile_Button.ZIndex = 3
     
 	if UserInputService.GamepadEnabled then
         Device_Type = 'Controller'
@@ -489,7 +480,7 @@ function Library.new()
     local function Tween_Position(Target_Position)
     local Tween_Info = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
     local Goal = {Position = Target_Position}
-    local Tween = TweenService:Create(mobile_button, Tween_Info, Goal)
+    local Tween = TweenService:Create(Mobile_Button, Tween_Info, Goal)
     Tween:Play()
     end
 
@@ -524,14 +515,14 @@ function Library.new()
         local Delta = input.Position - Drag_Start
         local New_Position = UDim2.new(Start_Position.X.Scale, Start_Position.X.Offset + Delta.X, Start_Position.Y.Scale, Start_Position.Y.Offset + Delta.Y)
 
-        TweenService:Create(mobile_button, TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Position = New_Position}):Play()
+        TweenService:Create(Mobile_Button, TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Position = New_Position}):Play()
     end
 
-    mobile_button.InputBegan:Connect(function(input)
+    Mobile_Button.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             Dragging = true
             Drag_Start = input.Position
-            Start_Position = mobile_button.Position
+            Start_Position = Mobile_Button.Position
         
             input.Changed:Connect(function()
                 if input.UserInputState == Enum.UserInputState.End then
@@ -541,7 +532,7 @@ function Library.new()
         end
     end)
 
-    mobile_button.InputChanged:Connect(function(input)
+    Mobile_Button.InputChanged:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
             Drag_Input = input
         end
@@ -555,25 +546,25 @@ function Library.new()
 
     local UICorner = Instance.new('UICorner')
     UICorner.CornerRadius = UDim.new(0, 13)
-    UICorner.Parent = mobile_button
+    UICorner.Parent = Mobile_Button
 
-    local shadowMobile = Instance.new('ImageLabel')
-    shadowMobile.Name = 'Shadow'
-    shadowMobile.Parent = mobile_button
-    shadowMobile.AnchorPoint = Vector2.new(0.5, 0.5)
-    shadowMobile.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    shadowMobile.BackgroundTransparency = 1.000
-    shadowMobile.BorderColor3 = Color3.fromRGB(0, 0, 0)
-    shadowMobile.BorderSizePixel = 0
-    shadowMobile.Position = UDim2.new(0.5, 0, 0.5, 0)
-    shadowMobile.Size = UDim2.new(0, 100, 0, 58)
-    shadowMobile.ZIndex = 0
-    shadowMobile.Image = 'rbxassetid://17183270335'
-    shadowMobile.ImageTransparency = 0.200
+    local Mobile_Button_Shadow = Instance.new('ImageLabel')
+    Mobile_Button_Shadow.Name = 'Shadow'
+    Mobile_Button_Shadow.Parent = Mobile_Button
+    Mobile_Button_Shadow.AnchorPoint = Vector2.new(0.5, 0.5)
+    Mobile_Button_Shadow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    Mobile_Button_Shadow.BackgroundTransparency = 1.000
+    Mobile_Button_Shadow.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    Mobile_Button_Shadow.BorderSizePixel = 0
+    Mobile_Button_Shadow.Position = UDim2.new(0.5, 0, 0.5, 0)
+    Mobile_Button_Shadow.Size = UDim2.new(0, 100, 0, 58)
+    Mobile_Button_Shadow.ZIndex = 0
+    Mobile_Button_Shadow.Image = 'rbxassetid://17183270335'
+    Mobile_Button_Shadow.ImageTransparency = 0.200
 
     local State = Instance.new('TextLabel')
     State.Name = 'State'
-    State.Parent = mobile_button
+    State.Parent = Mobile_Button
     State.AnchorPoint = Vector2.new(0.5, 0.5)
     State.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     State.BackgroundTransparency = 1.000
@@ -591,7 +582,7 @@ function Library.new()
 
     local Icon = Instance.new('ImageLabel')
     Icon.Name = 'Icon'
-    Icon.Parent = mobile_button
+    Icon.Parent = Mobile_Button
     Icon.AnchorPoint = Vector2.new(0.5, 0.5)
     Icon.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     Icon.BackgroundTransparency = 1.000
@@ -603,12 +594,12 @@ function Library.new()
 	Icon.ZIndex = 3
 
     if Device_Type == 'PC' then
-        mobile_button.Visible = false
-        shadowMobile.Visible = false
+        Mobile_Button.Visible = false
+        Mobile_Button_Shadow.Visible = false
         Icon.Visible = false
     else
-        mobile_button.Visible = true
-        shadowMobile.Visible = true
+        Mobile_Button.Visible = true
+        Mobile_Button_Shadow.Visible = true
         Icon.Visible = true
     end
 
@@ -620,21 +611,21 @@ function Library.new()
         return x
     end
 
-    mobile_button.AnchorPoint = Vector2.new(0.5, 0.5)
-    shadowMobile.AnchorPoint = Vector2.new(0.5, 0.5)
+    Mobile_Button.AnchorPoint = Vector2.new(0.5, 0.5)
+    Mobile_Button_Shadow.AnchorPoint = Vector2.new(0.5, 0.5)
     Icon.AnchorPoint = Vector2.new(0.5, 0.5)
 
     local function Hide_Button()
         local Hide_Tween_Info = TweenInfo.new(0.6, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut)
-        TweenService:Create(mobile_button, Hide_Tween_Info, {Size = UDim2.new(0, 0, 0, 0)}):Play()
-        TweenService:Create(shadowMobile, Hide_Tween_Info, {Size = UDim2.new(0, 0, 0, 0)}):Play()
+        TweenService:Create(Mobile_Button, Hide_Tween_Info, {Size = UDim2.new(0, 0, 0, 0)}):Play()
+        TweenService:Create(Mobile_Button_Shadow, Hide_Tween_Info, {Size = UDim2.new(0, 0, 0, 0)}):Play()
         TweenService:Create(Icon, Hide_Tween_Info, {Size = UDim2.new(0, 0, 0, 0)}):Play()
     end
 
     local function Show_Button()
         local Show_Tween_Info = TweenInfo.new(0.6, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut)
-        TweenService:Create(mobile_button, Show_Tween_Info, {Size = UDim2.new(0, 85, 0, 38)}):Play()
-        TweenService:Create(shadowMobile, Show_Tween_Info, {Size = UDim2.new(0, 100, 0, 58)}):Play()
+        TweenService:Create(Mobile_Button, Show_Tween_Info, {Size = UDim2.new(0, 85, 0, 38)}):Play()
+        TweenService:Create(Mobile_Button_Shadow, Show_Tween_Info, {Size = UDim2.new(0, 100, 0, 58)}):Play()
         TweenService:Create(Icon, Show_Tween_Info, {Size = UDim2.new(0, 30, 0, 30)}):Play()
     end
 
@@ -695,7 +686,7 @@ function Library.new()
     	end
 	end)
 
-    mobile_button.MouseButton1Click:Connect(function()
+    Mobile_Button.MouseButton1Click:Connect(function()
         Library.visible(container)
     end)
 
@@ -734,7 +725,7 @@ function Library.new()
 			ImageTransparency = 0
 		}):Play()
 
-		for _, object in tabs:GetChildren() do
+		for _, object in Tabs:GetChildren() do
 			if object.Name ~= 'Tab' then
 				continue
 			end
@@ -774,7 +765,7 @@ function Library.new()
 		tab.Text = ''
 		tab.TextColor3 = Color3.fromRGB(0, 0, 0)
 		tab.TextSize = 14.000
-		tab.Parent = tabs
+		tab.Parent = Tabs
 
 		local tabCorner = Instance.new('UICorner')
 		tabCorner.CornerRadius = UDim.new(0, 5)
@@ -1386,18 +1377,18 @@ function Library.new()
 			UICorner.CornerRadius = UDim.new(0, 10)
 			UICorner.Parent = button
 
-			local Buttonmark = Instance.new('ImageLabel')
-			Buttonmark.Name = 'Buttonmark'
-			Buttonmark.Parent = button
-			Buttonmark.AnchorPoint = Vector2.new(0.5, 0.5) 
-			Buttonmark.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-			Buttonmark.BackgroundTransparency = 1.000
-			Buttonmark.BorderColor3 = Color3.fromRGB(0, 0, 0)
-			Buttonmark.BorderSizePixel = 0
-			Buttonmark.Position = UDim2.new(0.915, 0, 0.5, 0)
-			Buttonmark.Size = UDim2.new(0, 18, 0, 18)
-			Buttonmark.ZIndex = 2
-			Buttonmark.Image = 'rbxassetid://3944703587'
+			local Button_Icon = Instance.new('ImageLabel')
+			Button_Icon.Name = 'Icon'
+			Button_Icon.Parent = button
+			Button_Icon.AnchorPoint = Vector2.new(0.5, 0.5)
+			Button_Icon.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			Button_Icon.BackgroundTransparency = 1.000
+			Button_Icon.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			Button_Icon.BorderSizePixel = 0
+			Button_Icon.Position = UDim2.new(0.915, 0, 0.5, 0)
+			Button_Icon.Size = UDim2.new(0, 18, 0, 18)
+			Button_Icon.ZIndex = 2
+			Button_Icon.Image = 'rbxassetid://3944703587'
 			
 			local TextLabel = Instance.new('TextLabel')
 			TextLabel.Parent = button
@@ -1441,18 +1432,18 @@ function Library.new()
 			UICorner.CornerRadius = UDim.new(0, 10)
 			UICorner.Parent = button
 
-			local Buttonmark = Instance.new('ImageLabel')
-			Buttonmark.Name = 'Buttonmark'
-			Buttonmark.Parent = button
-			Buttonmark.AnchorPoint = Vector2.new(0.5, 0.5) 
-			Buttonmark.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-			Buttonmark.BackgroundTransparency = 1.000
-			Buttonmark.BorderColor3 = Color3.fromRGB(0, 0, 0)
-			Buttonmark.BorderSizePixel = 0
-			Buttonmark.Position = UDim2.new(0.915, 0, 0.5, 0)
-			Buttonmark.Size = UDim2.new(0, 18, 0, 18)
-			Buttonmark.ZIndex = 2
-			Buttonmark.Image = 'rbxassetid://3944703587'
+			local Button_Icon = Instance.new('ImageLabel')
+			Button_Icon.Name = 'Icon'
+			Button_Icon.Parent = button
+			Button_Icon.AnchorPoint = Vector2.new(0.5, 0.5)
+			Button_Icon.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			Button_Icon.BackgroundTransparency = 1.000
+			Button_Icon.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			Button_Icon.BorderSizePixel = 0
+			Button_Icon.Position = UDim2.new(0.915, 0, 0.5, 0)
+			Button_Icon.Size = UDim2.new(0, 18, 0, 18)
+			Button_Icon.ZIndex = 2
+			Button_Icon.Image = 'rbxassetid://3944703587'
 			
 			local TextLabel = Instance.new('TextLabel')
 			TextLabel.Parent = button
@@ -1496,7 +1487,7 @@ function Library.new()
 		end
 
         function Module:update_slider()
-            local Result = math.clamp((Get_Mouse.X - self.slider.Box.AbsolutePosition.X) / self.slider.Box.AbsoluteSize.X, 0, 1)
+            local Result = math.clamp((Local_Mouse.X - self.slider.Box.AbsolutePosition.X) / self.slider.Box.AbsoluteSize.X, 0, 1)
             if not Result then return end
 
             local step = self.step or 0.1
@@ -1696,6 +1687,7 @@ function Library.new()
 			local section = self.section == 'left' and left_section or right_section
 			local list_size = 6
 			local open = false
+			local maximum_option = self.maximum_option or 1
 
 			local option = Instance.new('TextButton')
 			option.Name = 'Option'
@@ -1818,8 +1810,40 @@ function Library.new()
 
 			local Dropdown = {}
 
+			local function get_selected_text()
+				if maximum_option == 1 then
+					return Library.Flags[self.flag] or ''
+				else
+					local selected = Library.Flags[self.flag] or {}
+					if #selected == 0 then
+						return self.name
+					elseif #selected == 1 then
+						return selected[1]
+					else
+						return table.concat(selected, ', ')
+					end
+				end
+			end
+
+			local function format_callback_value()
+				if maximum_option == 1 then
+					return Library.Flags[self.flag]
+				else
+					local selected = Library.Flags[self.flag] or {}
+					if #selected == 0 then
+						return ''
+					else
+						return table.concat(selected, ', ')
+					end
+				end
+			end
+
 			function Dropdown:open()
-				dropdown.Box.TextLabel.Text = Library.Flags[self.flag]
+				if maximum_option == 1 then
+					dropdown.Box.TextLabel.Text = Library.Flags[self.flag]
+				else
+					dropdown.Box.TextLabel.Text = get_selected_text()
+				end
 
 				TweenService:Create(dropdown.Box.Options, TweenInfo.new(0.4), {
 					Size = UDim2.new(0, 202, 0, list_size)
@@ -1835,7 +1859,7 @@ function Library.new()
 			end
 			
 			function Dropdown:close()
-				dropdown.Box.TextLabel.Text = self.name
+				dropdown.Box.TextLabel.Text = get_selected_text()
 				TweenService:Create(dropdown.Box.Options, TweenInfo.new(0.4), {
 					Size = UDim2.new(0, 202, 0, 0)
 				}):Play()
@@ -1860,29 +1884,59 @@ function Library.new()
 			end
 
 			function Dropdown:select_option()
-				TweenService:Create(self.new_option, TweenInfo.new(0.4), {
-					TextTransparency = 0
-				}):Play()
-
-				for _, object in dropdown.Box.Options:GetChildren() do
-					if object.Name ~= 'Option' then
-						continue
-					end
-
-					if object.Text == Library.Flags[self.flag] then
-						continue
-					end
-
-					TweenService:Create(object, TweenInfo.new(0.4), {
-						TextTransparency = 0.5
+				if maximum_option == 1 then
+					TweenService:Create(self.new_option, TweenInfo.new(0.4), {
+						TextTransparency = 0
 					}):Play()
-				end
 
-				dropdown.Box.TextLabel.Text = self.new_option.Text
+					for _, object in dropdown.Box.Options:GetChildren() do
+						if object.Name ~= 'Option' then
+							continue
+						end
+
+						if object.Text == Library.Flags[self.flag] then
+							continue
+						end
+
+						TweenService:Create(object, TweenInfo.new(0.4), {
+							TextTransparency = 0.5
+						}):Play()
+					end
+
+					dropdown.Box.TextLabel.Text = self.new_option.Text
+				else
+					local selected_list = Library.Flags[self.flag] or {}
+					for _, object in dropdown.Box.Options:GetChildren() do
+						if object.Name ~= 'Option' then
+							continue
+						end
+
+						local is_selected = false
+						for _, sel in ipairs(selected_list) do
+							if sel == object.Text then
+								is_selected = true
+								break
+							end
+						end
+
+						if is_selected then
+							TweenService:Create(object, TweenInfo.new(0.4), {
+								TextTransparency = 0
+							}):Play()
+						else
+							TweenService:Create(object, TweenInfo.new(0.4), {
+								TextTransparency = 0.5
+							}):Play()
+						end
+					end
+
+					dropdown.Box.TextLabel.Text = get_selected_text()
+				end
 			end
 
 			function Dropdown:update()
 				Dropdown.clear()
+				list_size = 6
 
 				for _, value in self.options do
 					list_size += 23
@@ -1891,17 +1945,53 @@ function Library.new()
 					new_option.Parent = dropdown.Box.Options
 					new_option.Text = value
 	
-					if value == Library.Flags[self.flag] then
-						new_option.TextTransparency = 0
+					if maximum_option == 1 then
+						if value == Library.Flags[self.flag] then
+							new_option.TextTransparency = 0
+						end
+					else
+						local selected_list = Library.Flags[self.flag] or {}
+						local is_selected = false
+						for _, sel in ipairs(selected_list) do
+							if sel == value then
+								is_selected = true
+								break
+							end
+						end
+						if is_selected then
+							new_option.TextTransparency = 0
+						end
 					end
 	
 					new_option.MouseButton1Click:Connect(function()
-						Library.Flags[self.flag] = value
-						
-						if list_open then
-							dropdown.Box.TextLabel.Text = Library.Flags[self.flag]
+						if maximum_option == 1 then
+							Library.Flags[self.flag] = value
+						else
+							Library.Flags[self.flag] = Library.Flags[self.flag] or {}
+							local selected_list = Library.Flags[self.flag]
+							
+							local is_selected = false
+							local sel_index = 0
+							for idx, sel in ipairs(selected_list) do
+								if sel == value then
+									is_selected = true
+									sel_index = idx
+									break
+								end
+							end
+							
+							if is_selected then
+								if #selected_list > 1 then
+									table.remove(selected_list, sel_index)
+								end
+							else
+								if #selected_list < maximum_option then
+									table.insert(selected_list, value)
+								end
+							end
 						end
-						self.callback(Library.Flags[self.flag])
+						
+						self.callback(format_callback_value())
 						Library:save_flags()
 
 						Dropdown.select_option({
@@ -1913,10 +2003,30 @@ function Library.new()
 			end
 
 			if not Library.Flags[self.flag] then
-				Library.Flags[self.flag] = self.option
+				if maximum_option == 1 then
+					if type(self.option) == 'table' then
+						Library.Flags[self.flag] = self.option[1] or self.option
+					else
+						Library.Flags[self.flag] = self.option
+					end
+				else
+					if self.option then
+						if type(self.option) == 'table' then
+							local t = {}
+							for i, v in ipairs(self.option) do
+								if #t < maximum_option then table.insert(t, v) end
+							end
+							Library.Flags[self.flag] = t
+						else
+							Library.Flags[self.flag] = { self.option }
+						end
+					else
+						Library.Flags[self.flag] = {}
+					end
+				end
 			end
 			
-			self.callback(Library.Flags[self.flag])
+			self.callback(format_callback_value())
 			Dropdown.update(self)
 
 			dropdown.MouseButton1Click:Connect(function()
@@ -2327,6 +2437,10 @@ function Library.new()
 				enable_checkbox()
 			end
 
+			if props.callback then 
+				props.callback(open)
+			end
+
 			button.MouseButton1Click:Connect(function()
 				open = not open
 				Library.Flags[props.flag] = open
@@ -2334,13 +2448,17 @@ function Library.new()
 				if open then
 					enable_checkbox()
 					update_body_height()
-					container:TweenSize(UDim2.new(0, 215, 0, 45 + body_height), 'Out', 'Quad', 0.2, true)
-					body:TweenSize(UDim2.new(1, 0, 0, body_height), 'Out', 'Quad', 0.2, true)
+					if container and container.Parent then
+						pcall(function() container:TweenSize(UDim2.new(0, 215, 0, 45 + body_height), 'Out', 'Quad', 0.2, true) end)
+						pcall(function() body:TweenSize(UDim2.new(1, 0, 0, body_height), 'Out', 'Quad', 0.2, true) end)
+					end
 					if props.callback then props.callback(true) end
 				else
 					disable_checkbox()
-					container:TweenSize(UDim2.new(0, 215, 0, 45), 'Out', 'Quad', 0.2, true)
-					body:TweenSize(UDim2.new(1, 0, 0, 0), 'Out', 'Quad', 0.2, true)
+					if container and container.Parent then
+						pcall(function() container:TweenSize(UDim2.new(0, 215, 0, 45), 'Out', 'Quad', 0.2, true) end)
+						pcall(function() body:TweenSize(UDim2.new(1, 0, 0, 0), 'Out', 'Quad', 0.2, true) end)
+					end
 					if props.callback then props.callback(false) end
 				end
 
@@ -2413,7 +2531,7 @@ function Library.new()
 			end
 
 			function ExpandableModule:update_slider(slider_config)
-				local Result = math.clamp((Get_Mouse.X - slider_config.slider.Box.AbsolutePosition.X) / slider_config.slider.Box.AbsoluteSize.X, 0, 1)
+				local Result = math.clamp((Local_Mouse.X - slider_config.slider.Box.AbsolutePosition.X) / slider_config.slider.Box.AbsoluteSize.X, 0, 1)
 				if not Result then return end
 
 				local step = slider_config.step or 0.1
@@ -2600,18 +2718,18 @@ function Library.new()
 						Library.Slider_Drag = false
 						Library:save_flags()
 						update_body_height()
-						if open then
-							container:TweenSize(UDim2.new(0, 215, 0, 45 + body_height), 'Out', 'Quad', 0.1, true)
-							body:TweenSize(UDim2.new(1, 0, 0, body_height), 'Out', 'Quad', 0.1, true)
+						if open and container and container.Parent then
+							pcall(function() container:TweenSize(UDim2.new(0, 215, 0, 45 + body_height), 'Out', 'Quad', 0.1, true) end)
+							pcall(function() body:TweenSize(UDim2.new(1, 0, 0, body_height), 'Out', 'Quad', 0.1, true) end)
 						end
 					end
 				end)
 
 				task.wait(0.05)
 				update_body_height()
-				if open then
-					container:TweenSize(UDim2.new(0, 215, 0, 45 + body_height), 'Out', 'Quad', 0.1, true)
-					body:TweenSize(UDim2.new(1, 0, 0, body_height), 'Out', 'Quad', 0.1, true)
+				if open and container and container.Parent then
+					pcall(function() container:TweenSize(UDim2.new(0, 215, 0, 45 + body_height), 'Out', 'Quad', 0.1, true) end)
+					pcall(function() body:TweenSize(UDim2.new(1, 0, 0, body_height), 'Out', 'Quad', 0.1, true) end)
 				end
 			end
 
@@ -2674,7 +2792,6 @@ function Library.new()
 				end
 			}
 		end
-
         return Module
     end
     return Tab
