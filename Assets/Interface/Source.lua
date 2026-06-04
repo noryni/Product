@@ -1871,7 +1871,7 @@ function Library.new()
 
 			function Dropdown:open()
 				if maximum_option == 1 then
-					dropdown.Box.TextLabel.Text = Library.Flags[self.flag]
+					dropdown.Box.TextLabel.Text = tostring(Library.Flags[self.flag] or self.option or '') --// [Holy Mistake 😭]
 				else
 					dropdown.Box.TextLabel.Text = get_selected_text()
 				end
