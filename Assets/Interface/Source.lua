@@ -256,48 +256,96 @@ function Library.new()
 	ContainerCorner.CornerRadius = UDim.new(0, 20)
 	ContainerCorner.Parent = container.Container
 
-	local Top = Instance.new('ImageLabel')
-	Top.Name = 'Header'
-	Top.Parent = Container
-	Top.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	Top.BackgroundTransparency = 1.000
-	Top.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	Top.BorderSizePixel = 0
-	Top.Size = UDim2.new(0, 699, 0, 39)
-	Top.Image = 'rbxassetid://17290652150'
+	local Header = Instance.new('ImageLabel')
+	Header.Name = 'Header'
+	Header.Parent = Container
+	Header.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Header.BackgroundTransparency = 1.000
+	Header.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Header.BorderSizePixel = 0
+	Header.Size = UDim2.new(0, 699, 0, 39)
+	Header.Image = 'rbxassetid://17290652150'
 
 	local Logo = Instance.new('ImageLabel')
     Logo.Name = 'Logo'
-    Logo.Parent = Top
-    Logo.AnchorPoint = Vector2.new(0.5, 0.5)
+    Logo.Parent = Header
+	Logo.AnchorPoint = Vector2.new(0.5, 0.5)
     Logo.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     Logo.BackgroundTransparency = 1.000
     Logo.BorderColor3 = Color3.fromRGB(0, 0, 0)
     Logo.BorderSizePixel = 0
-    Logo.Position = UDim2.new(0.950000048, 0, 0.5, 0)
-    Logo.Size = UDim2.new(0, 20, 0, 20)
-    Logo.Image = ''
-	Logo.ImageTransparency = 1
-	
+    Logo.Position = UDim2.new(0.150000006, 0, 1.79999995, 0)
+    Logo.Size = UDim2.new(0, 200, 0, 130)
+    Logo.Image = 'rbxassetid://73319068810237'
+    Logo.ImageTransparency = 0.1
+
+	local Product = Instance.new('Frame')
+	Product.Name = 'Product'
+	Product.Parent = Header
+	Product.AnchorPoint = Vector2.new(0, 0.5)
+	Product.BackgroundColor3 = Color3.fromRGB(15, 18, 24)
+	Product.BorderSizePixel = 0
+	Product.Position = UDim2.new(0.0199999996, 0, 0.5, 0)
+	Product.Size = UDim2.new(0, 90, 0, 25)
+
+	local Product_Corner = Instance.new('UICorner')
+	Product_Corner.CornerRadius = UDim.new(0, 8)
+	Product_Corner.Parent = Product
+
+	local Tag = Instance.new('Frame')
+	Tag.Name = 'Tag'
+	Tag.Parent = Product
+	Tag.AnchorPoint = Vector2.new(0, 0.5)
+	Tag.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Tag.BorderSizePixel = 0
+	Tag.Position = UDim2.new(0, 2, 0.5, 0)
+	Tag.Size = UDim2.new(0, 40, 0, 18)
+
+	local Tag_Corner = Instance.new('UICorner')
+	Tag_Corner.CornerRadius = UDim.new(0, 7)
+	Tag_Corner.Parent = Tag
+
+	local Tag_Gradient = Instance.new('UIGradient')
+	Tag_Gradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(66, 89, 182)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(37, 57, 137))}
+	Tag_Gradient.Rotation = 20
+	Tag_Gradient.Parent = Tag
+
 	local TextLabel = Instance.new('TextLabel')
-	TextLabel.Parent = Top
+	TextLabel.Name = 'TextLabel'
+	TextLabel.Parent = Tag
 	TextLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-	TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 	TextLabel.BackgroundTransparency = 1.000
-	TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	TextLabel.BorderSizePixel = 0
-	TextLabel.Position = UDim2.new(0.0938254446, 0, 0.496794879, 0)
-	TextLabel.Size = UDim2.new(0, 75, 0, 16)
+	TextLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+	TextLabel.Size = UDim2.new(0.92, 0, 0.9, 0)
 	TextLabel.FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold)
-	TextLabel.Text = getgenv().Product_Name
+	TextLabel.Text = getgenv().Product_Version
 	TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 	TextLabel.TextScaled = true
-	TextLabel.TextSize = 14.000
+	TextLabel.TextSize = 100.000
 	TextLabel.TextWrapped = true
-	TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+	TextLabel.TextXAlignment = Enum.TextXAlignment.Center
+	TextLabel.TextYAlignment = Enum.TextYAlignment.Center
 
-  	local TextLabel = Instance.new('TextLabel')
-  	TextLabel.Parent = Top
+	local TextLabel = Instance.new('TextLabel')
+	TextLabel.Name = 'TextLabel'
+	TextLabel.Parent = Product
+	TextLabel.AnchorPoint = Vector2.new(0, 0.5)
+	TextLabel.BackgroundTransparency = 1.000
+	TextLabel.BorderSizePixel = 0
+	TextLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+	TextLabel.Size = UDim2.new(0.400000006, 0, 0.699999988, 0)
+	TextLabel.FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold)
+	TextLabel.Text = getgenv().Product_Text
+	TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+	TextLabel.TextScaled = true
+	TextLabel.TextSize = 100.000
+	TextLabel.TextWrapped = true
+	TextLabel.TextXAlignment = Enum.TextXAlignment.Center
+	TextLabel.TextYAlignment = Enum.TextYAlignment.Center
+
+	local TextLabel = Instance.new('TextLabel')
+  	TextLabel.Parent = Header
   	TextLabel.AnchorPoint = Vector2.new(0.5, 0.5)
   	TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
   	TextLabel.BackgroundTransparency = 1.000
@@ -316,7 +364,7 @@ function Library.new()
 
 	local Cat_Gif = Instance.new('ImageLabel')
     Cat_Gif.Name = 'Cat Gif'
-    Cat_Gif.Parent = Top
+    Cat_Gif.Parent = Header
     Cat_Gif.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     Cat_Gif.BackgroundTransparency = 1.000
     Cat_Gif.BorderColor3 = Color3.fromRGB(0, 0, 0)
@@ -418,23 +466,6 @@ function Library.new()
 	Tabs.ScrollBarImageColor3 = Color3.fromRGB(0, 0, 0)
 	Tabs.ScrollBarThickness = 0
     Tabs.Parent = container.Container
-
-	local Noryn_Logo = Instance.new('Frame')
-	Noryn_Logo.Name = 'Noryn Logo'
-	Noryn_Logo.Parent = Container
-	Noryn_Logo.BackgroundTransparency = 1
-	Noryn_Logo.Position = UDim2.new(0, 0, 0.0915, 0)
-	Noryn_Logo.Size = UDim2.new(0, 209, 0, 80)
-
-	local Side_Logo = Instance.new('ImageLabel')
-	Side_Logo.Name = 'Side Logo'
-	Side_Logo.Parent = Noryn_Logo
-	Side_Logo.BackgroundTransparency = 1
-	Side_Logo.AnchorPoint = Vector2.new(0.5, 0.5)
-	Side_Logo.Position = UDim2.new(0.0500000007, 95, 0.400000006, 0)
-	Side_Logo.Size = UDim2.new(0, 200, 0, 150)
-
-	Side_Logo.Image = 'rbxassetid://115967977256317'
 
 	local Tabs_List = Instance.new('UIListLayout')
 	Tabs_List.Parent = Tabs
