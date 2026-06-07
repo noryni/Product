@@ -1841,9 +1841,9 @@ function Library.new()
 
 			local Dropdown = {}
 
-			local function get_selected_text()
+			local function get_diddy()
 				if maximum_option == 1 then
-					return Library.Flags[self.flag] or ''
+					return Library.Flags[self.flag] or self.name
 				else
 					local selected = Library.Flags[self.flag] or {}
 					if #selected == 0 then
@@ -1870,11 +1870,7 @@ function Library.new()
 			end
 
 			function Dropdown:open()
-				if maximum_option == 1 then
-					dropdown.Box.TextLabel.Text = tostring(Library.Flags[self.flag] or self.option or '') --// [Holy Mistake 😭]
-				else
-					dropdown.Box.TextLabel.Text = get_selected_text()
-				end
+				dropdown.Box.TextLabel.Text = get_diddy()
 
 				TweenService:Create(dropdown.Box.Options, TweenInfo.new(0.4), {
 					Size = UDim2.new(0, 202, 0, list_size)
@@ -1890,7 +1886,7 @@ function Library.new()
 			end
 			
 			function Dropdown:close()
-				dropdown.Box.TextLabel.Text = get_selected_text()
+				dropdown.Box.TextLabel.Text = self.name
 				TweenService:Create(dropdown.Box.Options, TweenInfo.new(0.4), {
 					Size = UDim2.new(0, 202, 0, 0)
 				}):Play()
@@ -1961,7 +1957,7 @@ function Library.new()
 						end
 					end
 
-					dropdown.Box.TextLabel.Text = get_selected_text()
+					dropdown.Box.TextLabel.Text = get_diddy()
 				end
 			end
 
