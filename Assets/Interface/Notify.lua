@@ -4,8 +4,13 @@ local RunService = game:GetService('RunService')
 local TextService = game:GetService('TextService')
 local CoreGui = cloneref(game:GetService('CoreGui'))
 
-local Noryn = CoreGui:WaitForChild('Noryn', 10)
-if not Noryn then return end
+local Noryn = CoreGui:FindFirstChild('Noryn')
+if not Noryn then
+	Noryn = Instance.new('ScreenGui')
+	Noryn.Name = 'Noryn'
+	Noryn.ResetOnSpawn = false
+	Noryn.Parent = CoreGui
+end
 
 local Notify = Noryn:FindFirstChild('Notify')
 if Notify then Notify:Destroy() end
