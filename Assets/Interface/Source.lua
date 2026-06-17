@@ -34,6 +34,8 @@ local LocalPlayer = Players.LocalPlayer
 local Local_Mouse = LocalPlayer:GetMouse();
 local Camera = Workspace.CurrentCamera
 
+local Game_Id = game.GameId
+
 local Library = {
 	Connections = {};
     Flags = {};
@@ -93,7 +95,7 @@ end
 function Library:save_flags()
     if not Library.exist() then return end
     if getgenv().Save_Enabled == false then return end
-    local Path = `Noryn/Games/{game.GameId}.lua`
+    local Path = `Noryn/Data/Configs/{Game_Id}.lua`
     local Flags = HttpService:JSONEncode(Library.Flags)
     if File_Support then
         writefile(Path, Flags)
@@ -104,11 +106,11 @@ end
 
 function Library:load_flags()
     if File_Support then
-        if not isfile(`Noryn/Games/{game.GameId}.lua`) then 
+        if not isfile(`Noryn/Data/Configs/{Game_Id}.lua`) then 
             Library:save_flags() 
             return 
         end
-        local Flags = readfile(`Noryn/Games/{game.GameId}.lua`)
+        local Flags = readfile(`Noryn/Data/Configs/{Game_Id}.lua`)
         if not Flags then 
             Library:save_flags() 
             return 
