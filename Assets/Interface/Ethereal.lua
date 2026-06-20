@@ -181,6 +181,8 @@ local function Load_Config()
     return nil
 end
 
+print('Interface by - ©noryni (Github)')
+
 local Library = {}
 Library.__index = Library
 
@@ -876,7 +878,7 @@ function Library:Create_Tab(Name, Icon)
         local Image = Create_Instance('ImageLabel', {
             Name = 'Icon',
             AnchorPoint = Vector2.new(0, 0.5), 
-            Position = UDim2.fromOffset(6, 0),
+            Position = UDim2.fromOffset(5, 14),
             Size = UDim2.fromOffset(16, 16), 
             BackgroundTransparency = 1, 
             Image = Icon,
