@@ -30,14 +30,41 @@ local CoreGui = cloneref(game:GetService('CoreGui'))
 
 local Place_Id = game.PlaceId
 
-pcall(function()
-    local Interface = CoreGui:FindFirstChild('Noryn')
-    if not Interface then return end
-    local Panel = Interface:FindFirstChild('Panel')
-    if Panel then
-        Panel:Destroy()
-    end
-end)
+local Library = {
+    Flags = {},
+    Control_Objects = {},
+    Tabs = {},
+    Tab_Buttons = {},
+    Search_Items = {},
+    Active_Tab = 1,
+    Visible = true,
+    Minimized = false,
+    Tweening = false,
+    Auto_Debounce = false,
+    Save_Dirty = false,
+    Loading = false,
+    Open_Dropdown = nil,
+    Capturing = nil,
+    Switching = false,
+    Searching = false
+}
+
+Library.__index = Library
+
+function Library:clear()
+	for _, object in CoreGui:GetChildren() do
+		if object.Name ~= 'Noryn' then
+			continue
+		end
+		object:Destroy()
+	end
+end
+
+function Library:exist()
+    if not Library.Core then return end
+    if not Library.Core.Parent then return end
+    return true
+end
 
 if getgenv then
     getgenv().Loaded = true
@@ -193,32 +220,19 @@ end
 
 print('Interface by - ©noryni (Github)')
 
-local Library = {}
-Library.__index = Library
-
 function Library.New()
     local self = setmetatable({}, Library)
 
-    self.Flags = {}
-    self.Control_Objects = {}
-    self.Tabs = {}
-    self.Tab_Buttons = {}
-    self.Search_Items = {}
-    self.Active_Tab = 1
-    self.Visible = true
-    self.Minimized = false
-    self.Tweening = false
-    self.Auto_Debounce = false
-    self.Save_Dirty = false
-    self.Loading = false
-    self.Open_Dropdown = nil
-    self.Capturing = nil
-    self.Switching = false
-    self.Searching = false
+    Library:clear()
 
     local Keybind = (getgenv and getgenv().Interface_Keybind) or Enum.KeyCode.LeftControl or Enum.KeyCode.Insert
     local Title = (getgenv and getgenv().Product_Name) or 'Noryn'
     local Version = (getgenv and getgenv().Product_Version) or 'v1.0'
+
+    local Existing = CoreGui:FindFirstChild('Noryn')
+    if Existing then
+        Existing:Destroy()
+    end
 
     local Screen_Gui = Create_Instance('ScreenGui', {
         Name = 'Noryn',
@@ -444,7 +458,7 @@ function Library.New()
     }, Search_Bar)
 
     Create_Corner(Search_Box, 6)
-    --// local Search_Stroke = Create_Stroke(Search_Box, Theme.Border, 1, 0.3)
+    local Search_Stroke = Create_Stroke(Search_Box, Theme.Border, 1, 0.3)
 
     Create_Instance('TextLabel', {
         Name = 'Glyph',
