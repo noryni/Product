@@ -225,7 +225,7 @@ function Library.New()
 
     Library:clear()
 
-    local Keybind = (getgenv and getgenv().Interface_Keybind) or Enum.KeyCode.LeftControl or Enum.KeyCode.Insert
+    local Keybind = (getgenv and getgenv().Interface_Keybind) or Enum.KeyCode.LeftControl
     local Title = (getgenv and getgenv().Product_Name) or 'Noryn'
     local Version = (getgenv and getgenv().Product_Version) or 'v1.0'
 
