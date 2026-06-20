@@ -32,7 +32,11 @@ local Place_Id = game.PlaceId
 
 pcall(function()
     local Interface = CoreGui:FindFirstChild('Noryn')
-    if Interface then Interface:Destroy() end
+    if not Interface then return end
+    local Panel = Interface:FindFirstChild('Panel')
+    if Panel then
+        Panel:Destroy()
+    end
 end)
 
 if getgenv then
@@ -43,6 +47,12 @@ end
 local Device = {
     ['Mobile'] = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled,
 }
+
+local File_Support = pcall(function() 
+    if not isfolder('Noryn') then
+        makefolder('Noryn')
+    end
+end)
 
 local Theme = {
     Accent = Color3.fromRGB(203, 104, 118),
