@@ -96,9 +96,26 @@ local Theme = {
 }
 
 local Badge_Colors = {
-    Hot = {Background = Color3.fromRGB(50, 20, 25), Text = Theme.Accent, Border = Color3.fromRGB(100, 40, 50)},
-    New = {Background = Color3.fromRGB(16, 46, 36), Text = Color3.fromRGB(96, 212, 160), Border = Color3.fromRGB(40, 110, 80)},
-    Beta = {Background = Color3.fromRGB(32, 22, 55), Text = Color3.fromRGB(176, 136, 238), Border = Color3.fromRGB(80, 56, 140)},
+    Hot = {
+        Background = Color3.fromRGB(50, 20, 25), 
+        Text = Theme.Accent, 
+        Border = Color3.fromRGB(100, 40, 50)
+    },
+    New = {
+        Background = Color3.fromRGB(16, 46, 36),
+        Text = Color3.fromRGB(96, 212, 160), 
+        Border = Color3.fromRGB(40, 110, 80)
+    },
+    Beta = {
+        Background = Color3.fromRGB(32, 22, 55), 
+        Text = Color3.fromRGB(176, 136, 238), 
+        Border = Color3.fromRGB(80, 56, 140)
+    },
+	Risky = {
+        Background = Color3.fromRGB(54, 42, 12), 
+        Text = Color3.fromRGB(230, 188, 64), 
+        Border = Color3.fromRGB(120, 92, 30)
+    }
 }
 
 local Spring_Style, Spring_Direction = Enum.EasingStyle.Back, Enum.EasingDirection.Out
@@ -119,7 +136,9 @@ local function Create_Tween(Object, Duration, Properties, Easing_Style, Easing_D
 end
 
 local function Create_Corner(Parent, Radius)
-    return Create_Instance('UICorner', {CornerRadius = UDim.new(0, Radius or 8)}, Parent)
+    return Create_Instance('UICorner', {
+        CornerRadius = UDim.new(0, Radius or 8)
+    }, Parent)
 end
 
 local function Create_Stroke(Parent, Color, Thickness, Transparency)
@@ -140,7 +159,9 @@ local function Hex_To_Color(Hex)
     local Red   = tonumber(Hex:sub(1, 2), 16)
     local Green = tonumber(Hex:sub(3, 4), 16)
     local Blue  = tonumber(Hex:sub(5, 6), 16)
-    if Red and Green and Blue then return Color3.fromRGB(Red, Green, Blue) end
+    if Red and Green and Blue then 
+        return Color3.fromRGB(Red, Green, Blue) 
+    end
     return nil
 end
 
@@ -360,6 +381,7 @@ function Library.New()
         RichText = true, 
         ZIndex = 12,
     }, Title_Bar)
+
     self.Title_Label = Title_Label
 
     Create_Instance('TextLabel', {
@@ -377,11 +399,19 @@ function Library.New()
 
     if Device['Mobile'] then
         local Close_Button = Create_Instance('TextButton', {
-            AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -14, 0.5, 0),
-            Size = UDim2.fromOffset(34, 28), BackgroundColor3 = Color3.fromRGB(18, 14, 15),
-            BorderSizePixel = 0, Font = Enum.Font.Code, TextSize = 14, Text = '✕',
-            TextColor3 = Color3.fromRGB(255, 107, 122), ZIndex = 60, AutoButtonColor = false,
+            AnchorPoint = Vector2.new(1, 0.5), 
+            Position = UDim2.new(1, -14, 0.5, 0),
+            Size = UDim2.fromOffset(34, 28), 
+            BackgroundColor3 = Color3.fromRGB(18, 14, 15),
+            BorderSizePixel = 0, 
+            Font = Enum.Font.Code, 
+            TextSize = 14, 
+            Text = '✕',
+            TextColor3 = Color3.fromRGB(255, 107, 122), 
+            ZIndex = 60, 
+            AutoButtonColor = false,
         }, Title_Bar)
+
         Create_Corner(Close_Button, 6)
         Create_Stroke(Close_Button, Color3.fromRGB(255, 107, 122), 1, 0.6)
         Close_Button.MouseButton1Click:Connect(function() self:Hide() end)
@@ -458,6 +488,7 @@ function Library.New()
     }, Search_Bar)
 
     Create_Corner(Search_Box, 6)
+
     local Search_Stroke = Create_Stroke(Search_Box, Theme.Border, 1, 0.3)
 
     Create_Instance('TextLabel', {
@@ -824,7 +855,9 @@ function Library:Show()
         self.Body.Visible, self.Footer.Visible = true, true
         self.Minimize_Button.Text = '▾  Min'
         Create_Tween(self.Panel, 0.30, {Size = UDim2.fromOffset(660, 420)})
-        task.delay(0.32, function() self.Tweening = false end)
+        task.delay(0.32, function() 
+            self.Tweening = false 
+        end)
     end)
     self.Visible = true
 end
@@ -1128,12 +1161,15 @@ function Library:Create_Tab(Name, Icon)
         Create_Stroke(Row, Theme.Border, 1, 0.3)
 
         Create_Instance('UIPadding', {
-            PaddingLeft = UDim.new(0, 14), PaddingRight = UDim.new(0, 14),
-            PaddingTop = UDim.new(0, 10), PaddingBottom = UDim.new(0, 12),
+            PaddingLeft = UDim.new(0, 14), 
+            PaddingRight = UDim.new(0, 14),
+            PaddingTop = UDim.new(0, 10), 
+            PaddingBottom = UDim.new(0, 12),
         }, Row)
 
         Create_Instance('UIListLayout', {
-            Padding = UDim.new(0, 6), SortOrder = Enum.SortOrder.LayoutOrder,
+            Padding = UDim.new(0, 6), 
+            SortOrder = Enum.SortOrder.LayoutOrder,
             HorizontalAlignment = Enum.HorizontalAlignment.Left,
         }, Row)
 
@@ -1145,8 +1181,10 @@ function Library:Create_Tab(Name, Icon)
         }, Row)
 
         Create_Instance('UIListLayout', {
-            FillDirection = Enum.FillDirection.Horizontal, Padding = UDim.new(0, 6),
-            VerticalAlignment = Enum.VerticalAlignment.Center, SortOrder = Enum.SortOrder.LayoutOrder,
+            FillDirection = Enum.FillDirection.Horizontal, 
+            Padding = UDim.new(0, 6),
+            VerticalAlignment = Enum.VerticalAlignment.Center, 
+            SortOrder = Enum.SortOrder.LayoutOrder,
         }, Head)
 
         Create_Instance('TextLabel', {
@@ -1198,8 +1236,86 @@ function Library:Create_Tab(Name, Icon)
         Register_Search(Row, Options.title)
     end
 
+	function Tab.Create_Divider(Options)
+    	Options = Options or {}
+
+    	local Column = Target_Column(Options.section)
+    	local Order  = Next_Order(Options.section)
+
+    	local Divider = Create_Instance('Frame', {
+			Name = 'Divider',
+        	Size = UDim2.new(1, 0, 0, 1),
+        	BackgroundColor3 = Options.color or Color3.fromRGB(255, 255, 255),
+        	BorderSizePixel = 0,
+        	LayoutOrder = Order,
+        	ZIndex = 15,
+    	}, Column)
+
+    	local Gradient = Create_Instance('UIGradient', {
+        	Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, Color3.fromRGB(12, 12, 14)),   
+            ColorSequenceKeypoint.new(0.15, Options.color or Color3.fromRGB(203, 104, 118)),
+            ColorSequenceKeypoint.new(0.85, Options.color or Color3.fromRGB(203, 104, 118)),
+            ColorSequenceKeypoint.new(1, Color3.fromRGB(12, 12, 14)), 
+            }),
+            Transparency = NumberSequence.new(0),
+            Rotation = 0,
+        }, Divider)
+        return Divider
+    end
+
+    function Tab.Create_Image(Options)
+        local Width = (Options.size and Options.size[1]) or 0
+        local Height = (Options.size and Options.size[2]) or 100
+
+        local Row = Create_Instance('Frame', {
+            Name = 'Thumbnail',
+            Size = UDim2.new(1, 0, 0, Height),
+            BackgroundColor3 = Theme.Panel_2,
+            BorderSizePixel = 0,
+            LayoutOrder = Next_Order(Options.section),
+            ZIndex = 15,
+        }, Target_Column(Options.section))
+
+        Create_Corner(Row, 8)
+        Create_Stroke(Row, Theme.Border, 1, 0.3)
+
+        local Picture = Create_Instance('ImageLabel', {
+            Name = 'Picture',
+            Size = UDim2.fromScale(1, 1),
+            BackgroundTransparency = 1,
+            Image = Options.image or '',
+            ScaleType = Enum.ScaleType.Fit,
+            ZIndex = 16,
+        }, Row)
+
+        Create_Corner(Picture, 8)
+
+        local Fade = Create_Instance('Frame', {
+            Name = 'Gradient',
+            AnchorPoint = Vector2.new(0, 1),
+            Position = UDim2.new(0, 0, 1, 0),
+            Size = UDim2.new(1, 0, 0.6, 0),
+            BackgroundColor3 = Color3.fromRGB(12, 12, 14), -- // #0C0C0E
+            BorderSizePixel = 0,
+            ZIndex = 17,
+        }, Row)
+
+        Create_Instance('UIGradient', {
+            Rotation = 90,
+            Transparency = NumberSequence.new({
+            NumberSequenceKeypoint.new(0, 1),
+            NumberSequenceKeypoint.new(1, 0),
+            }),
+        }, Fade)
+
+        Create_Corner(Fade, 8)
+        Register_Search(Row, Options.name or 'Image')
+        return Row
+    end
+
     function Tab.Create_Button(Options)
-        local Has_Description = Options.description and Options.description ~= ''
+        local Has_Description = Options.info and Options.info ~= ''
         local Row = Row_Frame(Has_Description and 52 or 40, Options.section)
         Row.Name = Options.name or 'Button'
         Row_Header(Row, Options.name or 'Button', Options.badge, Has_Description and 9 or 11)
@@ -1211,7 +1327,7 @@ function Library:Create_Tab(Name, Icon)
                 BackgroundTransparency = 1, 
                 Font = Enum.Font.Code, 
                 TextSize = 11,
-                Text = Options.description, 
+                Text = Options.info or '',
                 TextColor3 = Theme.Dim,
                 TextXAlignment = Enum.TextXAlignment.Left, 
                 TextTruncate = Enum.TextTruncate.AtEnd,
@@ -1254,26 +1370,29 @@ function Library:Create_Tab(Name, Icon)
         Register_Search(Row, Options.name)
     end
 
-    function Tab.Create_Description_Toggle(Options)
+    function Tab.Create_Toggle(Options)
         local Flag = Options.flag or Options.name
         local Default = Options.enabled == true
+        local Has_Description = Options.info and Options.info ~= ''
 
-        local Row = Row_Frame(52, Options.section)
+        local Row = Row_Frame(Has_Description and 52 or 40, Options.section)
         Row.Name = Flag
-        Row_Header(Row, Options.name or Flag, Options.badge, 9)
+        Row_Header(Row, Options.name or Flag, Options.badge, Has_Description and 9 or 11)
 
-        Create_Instance('TextLabel', {
-            Position = UDim2.fromOffset(14, 30), 
-            Size = UDim2.fromOffset(300, 14),
-            BackgroundTransparency = 1, 
-            Font = Enum.Font.Code, 
-            TextSize = 11,
-            Text = Options.description or '', 
-            TextColor3 = Theme.Dim,
-            TextXAlignment = Enum.TextXAlignment.Left, 
-            TextTruncate = Enum.TextTruncate.AtEnd,
-            ZIndex = 16,
-        }, Row)
+        if Has_Description then
+            Create_Instance('TextLabel', {
+                Position = UDim2.fromOffset(14, 30), 
+                Size = UDim2.fromOffset(300, 14),
+                BackgroundTransparency = 1, 
+                Font = Enum.Font.Code, 
+                TextSize = 11,
+                Text = Options.info or '', 
+                TextColor3 = Theme.Dim,
+                TextXAlignment = Enum.TextXAlignment.Left, 
+                TextTruncate = Enum.TextTruncate.AtEnd,
+                ZIndex = 16,
+            }, Row)
+        end
 
         local Track = Create_Instance('Frame', {
             AnchorPoint = Vector2.new(1, 0.5), 
@@ -1332,11 +1451,6 @@ function Library:Create_Tab(Name, Icon)
         end)
 
         Register_Search(Row, Options.name or Flag)
-    end
-
-    function Tab.Create_Toggle(Options)
-        Options.description = Options.description or ''
-        Tab.Create_Description_Toggle(Options)
     end
 
     function Tab.Create_Slider(Options)
@@ -1471,83 +1585,96 @@ function Library:Create_Tab(Name, Icon)
     end
 
     function Tab.Create_Dropdown(Options)
-        local Flag = Options.flag or Options.name
-        local Choices = Options.options or {}
-        local Default = Options.default or Choices[1]
-        local Row_Height = 28
-        local Max_List = math.min(#Choices, 5)
+    	local Flag = Options.flag or Options.name
+    	local Choices = Options.options or {}
+    	local Default = Options.default or Choices[1]
+    	local Row_Height = 28
+    	local Max_List = math.min(#Choices, 5)
+    	local Needs_Scroll = #Choices > 5
 
-        local Row = Row_Frame(46, Options.section)
-        Row.Name = Flag
-        Row_Header(Row, Options.name or Flag, Options.badge, 14)
+    	local Row = Row_Frame(46, Options.section)
+    	Row.Name = Flag
+    	Row_Header(Row, Options.name or Flag, Options.badge, 14)
 
-        local Box = Create_Instance('TextButton', {
-            AnchorPoint = Vector2.new(1, 0.5), 
-            Position = UDim2.new(1, -14, 0.5, 0),
-            Size = UDim2.fromOffset(140, 28), 
-            BackgroundColor3 = Theme.Not_Enabled,
-            BorderSizePixel = 0, 
-            Font = Enum.Font.Code, 
-            TextSize = 12,
-            Text = '', 
-            TextColor3 = Theme.Text, 
-            ZIndex = 17, 
-            AutoButtonColor = false,
-        }, Row)
+    	local Box = Create_Instance('TextButton', {
+        	AnchorPoint = Vector2.new(1, 0), 
+        	Position = UDim2.new(1, -14, 0, 9),
+        	Size = UDim2.fromOffset(140, 28), 
+        	BackgroundColor3 = Theme.Not_Enabled,
+        	BorderSizePixel = 0, 
+       	 	Font = Enum.Font.Code, 
+        	TextSize = 12,
+        	Text = '', 
+        	TextColor3 = Theme.Text, 
+        	ZIndex = 17, 
+        	AutoButtonColor = false,
+    	}, Row)
 
-        Create_Corner(Box, 6)
-        Create_Stroke(Box, Theme.Border, 1, 0.3)
+    	Create_Corner(Box, 6)
+    	Create_Stroke(Box, Theme.Border, 1, 0.3)
 
-        local Selected_Label = Create_Instance('TextLabel', {
-            Position = UDim2.fromOffset(10, 0), 
-            Size = UDim2.new(1, -34, 1, 0),
-            BackgroundTransparency = 1, 
-            Font = Enum.Font.Code, 
-            TextSize = 12,
-            Text = tostring(Default), 
-            TextColor3 = Theme.Text,
-            TextXAlignment = Enum.TextXAlignment.Left, 
-            TextTruncate = Enum.TextTruncate.AtEnd,
-            ZIndex = 18,
-        }, Box)
+    	local Selected_Label = Create_Instance('TextLabel', {
+        	Position = UDim2.fromOffset(10, 0), 
+        	Size = UDim2.new(1, -34, 1, 0),
+        	BackgroundTransparency = 1, 
+        	Font = Enum.Font.Code, 
+        	TextSize = 12,
+        	Text = tostring(Default), 
+        	TextColor3 = Theme.Text,
+        	TextXAlignment = Enum.TextXAlignment.Left, 
+        	TextTruncate = Enum.TextTruncate.AtEnd,
+        	ZIndex = 18,
+    	}, Box)
 
-        local Arrow = Create_Instance('TextLabel', {
-            AnchorPoint = Vector2.new(1, 0.5), 
-            Position = UDim2.new(1, -8, 0.5, 0),
-            Size = UDim2.fromOffset(14, 14), 
-            BackgroundTransparency = 1,
-            Font = Enum.Font.Code, 
-            TextSize = 12,
-            Text = '▾', 
-            TextColor3 = Theme.Muted, 
-            ZIndex = 18,
-        }, Box)
+    	local Arrow = Create_Instance('TextLabel', {
+        	AnchorPoint = Vector2.new(1, 0.5), 
+        	Position = UDim2.new(1, -8, 0.5, 0),
+        	Size = UDim2.fromOffset(14, 14), 
+        	BackgroundTransparency = 1,
+        	Font = Enum.Font.Code, 
+        	TextSize = 12,
+        	Text = '▾', 
+        	TextColor3 = Theme.Muted, 
+        	ZIndex = 18,
+    	}, Box)
 
-        local List = Create_Instance('Frame', {
-            Position = UDim2.new(0, 14, 0, 46), 
-            Size = UDim2.new(1, -28, 0, 0),
-            BackgroundColor3 = Theme.Panel, 
-            BorderSizePixel = 0, 
-            ClipsDescendants = true, 
-            ZIndex = 19,
-        }, Row)
+    	local List = Create_Instance('ScrollingFrame', {
+    		Position = UDim2.new(0, 14, 0, 46),
+    		Size = UDim2.new(1, -28, 0, 0),
+    		BackgroundColor3 = Theme.Panel,
+    		BorderSizePixel = 0,
+    		ClipsDescendants = true,
+    		CanvasSize = UDim2.new(0, 0, 0, 0),
+    		AutomaticCanvasSize = Needs_Scroll and Enum.AutomaticSize.Y or Enum.AutomaticSize.None,
+    		ScrollBarThickness = Needs_Scroll and 4 or 0,
+    		ScrollBarImageColor3 = Theme.Accent,
+    		ScrollingDirection = Enum.ScrollingDirection.Y,
+    		ScrollingEnabled = Needs_Scroll,
+    		ZIndex = 19,
+		}, Row)
 
-        Create_Corner(List, 6)
-        Create_Stroke(List, Theme.Border, 1, 0.3)
-        Create_Instance('UIListLayout', {SortOrder = Enum.SortOrder.LayoutOrder}, List)
-        Create_Instance('UIPadding', {PaddingTop = UDim.new(0, 3), PaddingBottom = UDim.new(0, 3)}, List)
+    	Create_Corner(List, 6)
+    	Create_Stroke(List, Theme.Border, 1, 0.3)
+    	Create_Instance('UIListLayout', {SortOrder = Enum.SortOrder.LayoutOrder}, List)
+    	Create_Instance('UIPadding', {PaddingTop = UDim.new(0, 3), PaddingBottom = UDim.new(0, 3)}, List)
 
-        local Is_Open = false
-        local Full_Height = Max_List * Row_Height + 6
+    	local Is_Open = false
+    	local Full_Height = Max_List * Row_Height + 6
 
-        local function Close()
-            if not Is_Open then return end
-            Is_Open = false
-            self.Open_Dropdown = nil
-            Create_Tween(Arrow, 0.18, {Rotation = 0})
-            Create_Tween(List, 0.20, {Size = UDim2.new(1, -28, 0, 0)})
-            Create_Tween(Row, 0.22, {Size = UDim2.new(1, 0, 0, 46)})
-        end
+    	local function Close()
+        	if not Is_Open then return end
+        	Is_Open = false
+        	self.Open_Dropdown = nil
+        	List.Visible = false
+        	List.CanvasPosition = Vector2.new(0, 0)
+        	Create_Tween(Arrow, 0.18, {Rotation = 0})
+        	Create_Tween(List, 0.20, {Size = UDim2.new(1, -28, 0, 0)})
+        	Create_Tween(Row, 0.22, {Size = UDim2.new(1, 0, 0, 46)})
+    	end
+
+    	List.Visible = false
+    	List.Size = UDim2.new(1, -28, 0, 0)
+    	List.CanvasPosition = Vector2.new(0, 0)
 
         local function Set_Value(Value, Silent)
             self.Flags[Flag] = Value
@@ -1561,14 +1688,16 @@ function Library:Create_Tab(Name, Icon)
         end
 
         local function Open_List()
-            if Is_Open then Close() return end
-            if self.Open_Dropdown then self.Open_Dropdown() end
-            Is_Open = true
-            self.Open_Dropdown = Close
-            Create_Tween(Arrow, 0.18, {Rotation = 180})
-            Create_Tween(List, 0.22, {Size = UDim2.new(1, -28, 0, Full_Height)})
-            Create_Tween(Row, 0.24, {Size = UDim2.new(1, 0, 0, 46 + Full_Height + 8)})
-        end
+    		if Is_Open then Close() return end
+    		if self.Open_Dropdown then self.Open_Dropdown() end
+    		Is_Open = true
+    		self.Open_Dropdown = Close
+    		List.Visible = true
+    		List.CanvasPosition = Vector2.new(0, 0)
+    		Create_Tween(Arrow, 0.18, {Rotation = 180})
+    		Create_Tween(List, 0.22, {Size = UDim2.new(1, -28, 0, Full_Height)})
+    		Create_Tween(Row, 0.24, {Size = UDim2.new(1, 0, 0, 46 + Full_Height + 8)})
+		end
 
         for Index, Choice in ipairs(Choices) do
             local Item = Create_Instance('TextButton', {
@@ -1649,7 +1778,7 @@ function Library:Create_Tab(Name, Icon)
 
         Box.MouseButton1Click:Connect(function()
             Box.Text = '...'
-            --// Create_Tween(Box_Stroke, 0.12, {Color = Theme.Accent, Transparency = 0})
+            Create_Tween(Box_Stroke, 0.12, {Color = Theme.Accent, Transparency = 1}) --// [Change if you want (its lowk ass tho)] 
             self.Capturing = function(Key_Code)
                 self.Capturing = nil
                 Create_Tween(Box_Stroke, 0.12, {Color = Theme.Border, Transparency = 0.3})
@@ -1877,8 +2006,17 @@ function Library:Create_Tab(Name, Icon)
     return Tab
 end
 
-function Library:Get_Flag(Flag) return self.Flags[Flag] end
-function Library:Set_Flag(Flag, Value) self:Apply_Flag(Flag, Value, false) self:Autosave() end
-function Library:Save() Save_Config(self.Flags) end
+function Library:Get_Flag(Flag) 
+    return self.Flags[Flag] 
+end
+
+function Library:Set_Flag(Flag, Value) 
+    self:Apply_Flag(Flag, Value, false) 
+    self:Autosave() 
+end
+
+function Library:Save() 
+    Save_Config(self.Flags) 
+end
 
 return Library
