@@ -281,11 +281,16 @@ function Library.New()
     Library:clear()
 	self.Saved_Config = {}
 
-	if not (getgenv and getgenv().Config_Enabled == false) then
-    	self.Loading = true
-    	self.Saved_Config = Load_Config() or {}
-    	self.Loading = false
-	end
+	local Config_Was_Loaded = false
+    if not (getgenv and getgenv().Config_Enabled == false) then
+        self.Loading = true
+        local Loaded = Load_Config()
+        self.Saved_Config = Loaded or {}
+        self.Loading = false
+        if Loaded and next(Loaded) ~= nil then
+            Config_Was_Loaded = true
+        end
+    end
 
     local Keybind = (getgenv and getgenv().Interface_Keybind) or Enum.KeyCode.N
     local Title = (getgenv and getgenv().Product_Name) or 'Noryn'
@@ -844,6 +849,12 @@ function Library.New()
     Main_Panel.GroupTransparency = 1
     task.wait(0.05)
     self:Show()
+
+    if Config_Was_Loaded then
+        task.delay(0.6, function()
+            self:Status('Config loaded', Color3.fromRGB(96, 200, 140), 2)
+        end)
+    end
     return self
 end
 
