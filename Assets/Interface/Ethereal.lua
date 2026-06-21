@@ -167,17 +167,12 @@ local function Create_Corner(Parent, Radius)
     }, Parent)
 end
 
-
-local Assets = Create_Instance('Folder', {
-    Name = 'Assets',
-}, Parent)
-
 local function Create_Sound(Parent, Id, Volume)
     return Create_Instance('Sound', {
-        Name = 'Vfx',
+        Name = 'dsc.gg/getnoryn',
         SoundId = 'rbxassetid://' .. tostring(Id),
-        Volume = Volume or 1,
-    }, Assets)
+        Volume = Volume or 0.5,
+    }, Parent)
 end
 
 local function Create_Stroke(Parent, Color, Thickness, Transparency)
