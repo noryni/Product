@@ -490,7 +490,7 @@ function Library.New()
         ZIndex = 12,
     }, Title_Bar)
 
-    if not Device['Mobile'] then
+    if Device['Mobile'] then
         local Close_Button = Create_Instance('TextButton', {
             AnchorPoint = Vector2.new(1, 0.5), 
             Position = UDim2.new(1, -14, 0.5, 0),
@@ -513,7 +513,7 @@ function Library.New()
     local Minimize_Button = Create_Instance('TextButton', {
         Name = 'Minimize',
         AnchorPoint = Vector2.new(1, 0.5),
-        Position = UDim2.new(1, not Device['Mobile'] and -56 or -14, 0.5, 0),
+        Position = UDim2.new(1, Device['Mobile'] and -56 or -14, 0.5, 0),
         Size = UDim2.fromOffset(72, 26), 
         BackgroundColor3 = Theme.Panel_2,
         BorderSizePixel = 0, Font = Enum.Font.Code, 
@@ -781,7 +781,7 @@ function Library.New()
         ZIndex = 14,
     }, Footer)
 
-    if not Device['Mobile'] then
+    if Device['Mobile'] then
         local Float_Button = Create_Instance('ImageButton', {
             Name = 'Mobile', 
             AnchorPoint = Vector2.new(0.5, 1),
