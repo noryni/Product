@@ -323,6 +323,15 @@ function Library.New()
         ZIndex = 11,
     }, Main_Panel)
 
+	local Accent = Create_Instance('Frame', {
+    	Name = 'Accent',
+    	Position = UDim2.new(0, 0, 0, 0),
+    	Size = UDim2.new(1, 0, 0, 3),
+    	BackgroundColor3 = Theme.Accent,
+    	BorderSizePixel = 0,
+    	ZIndex = 50,
+	}, Title_Bar)
+
     local Warper = Create_Instance('Frame', {
         Name = 'Warper',
         AnchorPoint = Vector2.new(0, 0.5),
@@ -692,7 +701,8 @@ function Library.New()
             return
         end
         if Processed then return end
-        if Input.KeyCode == Keybind then self:Toggle() end
+        local Live_Keybind = (getgenv and getgenv().Interface_Keybind) or Keybind
+        if Input.KeyCode == Live_Keybind then self:Toggle() end
     end)
 
     task.spawn(function()
@@ -700,8 +710,9 @@ function Library.New()
             local Time = os.date('*t')
             local Hour = Time.hour % 12
             if Hour == 0 then Hour = 12 end
+            local Live_Keybind = (getgenv and getgenv().Interface_Keybind) or Keybind
             Clock_Label.Text = string.format('[%s] toggle  ·  %d:%02d %s',
-                tostring(Keybind):gsub('Enum.KeyCode.', ''), Hour, Time.min, Time.hour >= 12 and 'PM' or 'AM')
+                tostring(Live_Keybind):gsub('Enum.KeyCode.', ''), Hour, Time.min, Time.hour >= 12 and 'PM' or 'AM')
             task.wait(1)
         end
     end)
@@ -1524,20 +1535,22 @@ function Library:Create_Tab(Name, Icon)
         Row_Hover(Row)
 
         local function Set_Value(Value, Silent, Instant)
-            local Number = Snap(Value)
-            if Number == nil then return end
-            self.Flags[Flag] = Number
-            local Alpha = (Max == Min) and 0 or (Number - Min) / (Max - Min)
-            Value_Label.Text = tostring(Number) .. Suffix
-            if Instant then
-                Fill.Size = UDim2.fromScale(Alpha, 1)
-                Knob.Position = UDim2.fromScale(Alpha, 0.5)
-            else
-                Create_Tween(Fill, 0.08, {Size = UDim2.fromScale(Alpha, 1)}, Enum.EasingStyle.Sine)
-                Create_Tween(Knob, 0.08, {Position = UDim2.fromScale(Alpha, 0.5)}, Enum.EasingStyle.Sine)
-            end
-            if not Silent and Options.callback then pcall(Options.callback, Number) end
-        end
+    	local Number = Snap(Value)
+    	if Number == nil then return end
+    	self.Flags[Flag] = Number
+    	local Alpha = (Max == Min) and 0 or (Number - Min) / (Max - Min)
+    	Value_Label.Text = tostring(Number) .. Suffix
+    	if Instant then
+        	Create_Tween(Fill, 0.045, {Size = UDim2.fromScale(Alpha, 1)}, Enum.EasingStyle.Linear)
+        	Create_Tween(Knob, 0.045, {Position = UDim2.fromScale(Alpha, 0.5)}, Enum.EasingStyle.Linear)
+    	else
+        	Create_Tween(Fill, 0.12, {Size = UDim2.fromScale(Alpha, 1)}, Enum.EasingStyle.Quint)
+        	Create_Tween(Knob, 0.12, {Position = UDim2.fromScale(Alpha, 0.5)}, Enum.EasingStyle.Quint)
+    	end
+    		if not Silent and Options.callback then pcall(Options.callback, Number) 
+			end
+		end
+
 
         self.Flags[Flag] = Default
         self.Control_Objects[Flag] = {Kind = 'slider', Apply = function(Value, Silent) Set_Value(Value, Silent, false) end}
