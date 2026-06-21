@@ -87,6 +87,8 @@ local Theme = {
     White = Color3.fromRGB(255, 255, 255),
 }
 
+Library.Theme = Theme
+
 local Raw_Connections = {}
 
 Connection = setmetatable({}, {
