@@ -36,6 +36,7 @@ local Library = {
     Tabs = {},
     Tab_Buttons = {},
     Search_Items = {},
+	Saved_Config = {},
     Active_Tab = 1,
     Visible = true,
     Minimized = false,
@@ -51,18 +52,9 @@ local Library = {
 
 Library.__index = Library
 
-function Library:clear()
-	for _, object in CoreGui:GetChildren() do
-		if object.Name ~= 'Noryn' then
-			continue
-		end
-		object:Destroy()
-	end
-end
-
 function Library:exist()
-    if not Library.Core then return end
-    if not Library.Core.Parent then return end
+    if not self.Gui then return end
+    if not self.Gui.Parent then return end
     return true
 end
 
@@ -94,6 +86,40 @@ local Theme = {
     Not_Enabled = Color3.fromRGB(26,  26,  30),
     White = Color3.fromRGB(255, 255, 255),
 }
+
+local Raw_Connections = {}
+
+Connection = setmetatable({}, {
+    __newindex = function(_, Key, Value)
+        if Raw_Connections[Key] then
+            pcall(function() Raw_Connections[Key]:Disconnect() end)
+            Raw_Connections[Key] = nil
+        end
+        if Value then
+            Raw_Connections[Key] = Value
+        end
+    end,
+    __index = function(_, Key)
+        return Raw_Connections[Key]
+    end,
+})
+
+local function Clear_All_Connections()
+    for Key, Conn in pairs(Raw_Connections) do
+        pcall(function() Conn:Disconnect() end)
+        Raw_Connections[Key] = nil
+    end
+end
+
+function Library:clear()
+    Clear_All_Connections()
+    for _, object in CoreGui:GetChildren() do
+        if object.Name ~= 'Noryn' then
+            continue
+        end
+        object:Destroy()
+    end
+end
 
 local Badge_Colors = {
     Hot = {
@@ -246,9 +272,17 @@ function Library.New()
 
     Library:clear()
 
-    local Keybind = (getgenv and getgenv().Interface_Keybind) or Enum.KeyCode.LeftControl
+	self.Saved_Config = {}
+
+	if not (getgenv and getgenv().Config_Enabled == false) then
+    	self.Loading = true
+    	self.Saved_Config = Load_Config() or {}
+    	self.Loading = false
+	end
+
+    local Keybind = (getgenv and getgenv().Interface_Keybind) or Enum.KeyCode.N
     local Title = (getgenv and getgenv().Product_Name) or 'Noryn'
-    local Version = (getgenv and getgenv().Product_Version) or 'v1.0'
+    local Version = (getgenv and getgenv().Product_Version) or ''
 
     local Existing = CoreGui:FindFirstChild('Noryn')
     if Existing then
@@ -278,16 +312,23 @@ function Library.New()
     Create_Corner(Main_Panel, 14)
     self.Panel = Main_Panel
 
+    local Title_Bar = Create_Instance('Frame', {
+        Name = 'Top',
+        Size = UDim2.new(1, 0, 0, 46), 
+        BackgroundTransparency = 1, 
+        ZIndex = 11,
+    }, Main_Panel)
+
     do
         local Dragging, Drag_Start, Start_Position = false, nil, nil
         local Drag_Handle = Create_Instance('TextButton', {
-            Name = 'Drag Radius',
-            Size = UDim2.new(1, -130, 0, 46), 
+            Name = 'Drag',
+            Size = UDim2.new(1, 0, 0, 46),  
             BackgroundTransparency = 1,
             Text = '', 
             ZIndex = 50, 
             AutoButtonColor = false,
-        }, Main_Panel)
+        }, Title_Bar)
 
         Drag_Handle.InputBegan:Connect(function(Input)
             if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
@@ -310,20 +351,36 @@ function Library.New()
             local Abs_Y = Start_Position.Y.Scale * Viewport.Y + Start_Position.Y.Offset + Delta.Y
             local Half_W = Main_Panel.AbsoluteSize.X / 2
             local Half_H = Main_Panel.AbsoluteSize.Y / 2
-            Abs_X = math.clamp(Abs_X, Half_W, Viewport.X - Half_W)
+            local Freedom = (getgenv and getgenv().Freedom_Enabled) == true
+            if not Freedom then
+                Abs_X = math.clamp(Abs_X, Half_W, Viewport.X - Half_W)
+            end
             Abs_Y = math.clamp(Abs_Y, Half_H, Viewport.Y - Half_H)
             Create_Tween(Main_Panel, 0.05, {Position = UDim2.new(0, Abs_X, 0, Abs_Y)}, Enum.EasingStyle.Linear)
         end)
     end
 
-    local Title_Bar = Create_Instance('Frame', {
-        Name = 'Top',
-        Size = UDim2.new(1, 0, 0, 46), 
-        BackgroundTransparency = 1, 
-        ZIndex = 11,
-    }, Main_Panel)
+	task.spawn(function()
+        local Was_Free = (getgenv and getgenv().Freedom_Enabled) == true
+        while Main_Panel and Main_Panel.Parent do
+            local Freedom = (getgenv and getgenv().Freedom_Enabled) == true
+            if Was_Free and not Freedom then
+                local Viewport = Screen_Gui.AbsoluteSize
+                local Half_W = Main_Panel.AbsoluteSize.X / 2
+                local Half_H = Main_Panel.AbsoluteSize.Y / 2
+                local Current_Pos = Main_Panel.Position
+                local Abs_X = Current_Pos.X.Scale * Viewport.X + Current_Pos.X.Offset
+                local Abs_Y = Current_Pos.Y.Scale * Viewport.Y + Current_Pos.Y.Offset
+                Abs_X = math.clamp(Abs_X, Half_W, Viewport.X - Half_W)
+                Abs_Y = math.clamp(Abs_Y, Half_H, Viewport.Y - Half_H)
+                Create_Tween(Main_Panel, 0.35, {Position = UDim2.new(0, Abs_X, 0, Abs_Y)}, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+            end
+            Was_Free = Freedom
+            task.wait(0.1)
+        end
+    end)
 
-	local Accent = Create_Instance('Frame', {
+	Create_Instance('Frame', {
     	Name = 'Accent',
     	Position = UDim2.new(0, 0, 0, 0),
     	Size = UDim2.new(1, 0, 0, 3),
@@ -336,7 +393,7 @@ function Library.New()
         Name = 'Warper',
         AnchorPoint = Vector2.new(0, 0.5),
         Position = UDim2.new(0, 5, 0.5, 0),
-        Size = UDim2.fromOffset(50, 45),
+        Size = UDim2.fromOffset(50, 40),
         BackgroundTransparency = 1,
         ClipsDescendants = true,
         ZIndex = 20,
@@ -597,6 +654,51 @@ function Library.New()
 
     self.Footer = Footer
 
+	do
+    	local Footer_Dragging, Footer_Drag_Start, Footer_Start_Position = false, nil, nil
+
+    	local Footer_Drag = Create_Instance('TextButton', {
+        	Name = 'Drag',
+        	Size = UDim2.new(1, 0, 1, 0),
+        	BackgroundTransparency = 1,
+        	Text = '',
+        	ZIndex = 13,
+        	AutoButtonColor = false,
+    	}, Footer)
+
+    	Footer_Drag.InputBegan:Connect(function(Input)
+        	if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+            	Footer_Dragging = true
+            	Footer_Drag_Start = Input.Position
+            	Footer_Start_Position = Main_Panel.Position
+        	end
+    	end)
+
+    	Footer_Drag.InputEnded:Connect(function(Input)
+        	if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+            	Footer_Dragging = false
+        	end
+    	end)
+
+    	UserInputService.InputChanged:Connect(function(Input)
+        	if not Footer_Dragging then return end
+        	if Input.UserInputType ~= Enum.UserInputType.MouseMovement and Input.UserInputType ~= Enum.UserInputType.Touch then return end
+
+        	local Delta = Input.Position - Footer_Drag_Start
+        	local Viewport = Screen_Gui.AbsoluteSize
+        	local Abs_X = Footer_Start_Position.X.Scale * Viewport.X + Footer_Start_Position.X.Offset + Delta.X
+        	local Abs_Y = Footer_Start_Position.Y.Scale * Viewport.Y + Footer_Start_Position.Y.Offset + Delta.Y
+        	local Half_W = Main_Panel.AbsoluteSize.X / 2
+        	local Half_H = Main_Panel.AbsoluteSize.Y / 2
+        	local Freedom = (getgenv and getgenv().Freedom_Enabled) == true
+        	if not Freedom then
+            	Abs_X = math.clamp(Abs_X, Half_W, Viewport.X - Half_W)
+        	end
+        	Abs_Y = math.clamp(Abs_Y, Half_H, Viewport.Y - Half_H)
+        	Create_Tween(Main_Panel, 0.05, {Position = UDim2.new(0, Abs_X, 0, Abs_Y)}, Enum.EasingStyle.Linear)
+    	end)
+	end
+
     local Status_Dot = Create_Instance('Frame', {
         Name = 'Dot',
         AnchorPoint = Vector2.new(0, 0.5), 
@@ -724,21 +826,6 @@ function Library.New()
             Dot = not Dot
             task.wait(0.55)
         end
-    end)
-
-    task.spawn(function()
-        task.wait(0.3)
-        self.Loading = true
-        if not (getgenv and getgenv().Config_Enabled == false) then
-            local Saved = Load_Config()
-            if Saved then
-                for Flag, Value in pairs(Saved) do
-                    pcall(function() self:Apply_Flag(Flag, Value, true) end)
-                end
-                self:Status('Config loaded', Color3.fromRGB(96, 200, 140), 2)
-            end
-        end
-        self.Loading = false
     end)
 
     Main_Panel.GroupTransparency = 1
@@ -1262,7 +1349,7 @@ function Library:Create_Tab(Name, Icon)
         	ZIndex = 15,
     	}, Column)
 
-    	local Gradient = Create_Instance('UIGradient', {
+    	Create_Instance('UIGradient', {
         	Color = ColorSequence.new({
             ColorSequenceKeypoint.new(0, Color3.fromRGB(12, 12, 14)),   
             ColorSequenceKeypoint.new(0.15, Options.color or Color3.fromRGB(203, 104, 118)),
@@ -1276,7 +1363,6 @@ function Library:Create_Tab(Name, Icon)
     end
 
     function Tab.Create_Image(Options)
-        local Width = (Options.size and Options.size[1]) or 0
         local Height = (Options.size and Options.size[2]) or 100
 
         local Row = Create_Instance('Frame', {
@@ -1307,7 +1393,7 @@ function Library:Create_Tab(Name, Icon)
             AnchorPoint = Vector2.new(0, 1),
             Position = UDim2.new(0, 0, 1, 0),
             Size = UDim2.new(1, 0, 0.6, 0),
-            BackgroundColor3 = Color3.fromRGB(12, 12, 14), -- // #0C0C0E
+            BackgroundColor3 = Color3.fromRGB(12, 12, 14),
             BorderSizePixel = 0,
             ZIndex = 17,
         }, Row)
@@ -1383,7 +1469,9 @@ function Library:Create_Tab(Name, Icon)
 
     function Tab.Create_Toggle(Options)
         local Flag = Options.flag or Options.name
-        local Default = Options.enabled == true
+        local Saved_Value = self.Saved_Config and self.Saved_Config[Flag]
+		local Default = Saved_Value ~= nil and (Saved_Value == true) or (Options.enabled == true)
+
         local Has_Description = Options.info and Options.info ~= ''
 
         local Row = Row_Frame(Has_Description and 52 or 40, Options.section)
@@ -1447,6 +1535,12 @@ function Library:Create_Tab(Name, Icon)
         self.Flags[Flag] = Default
         self.Control_Objects[Flag] = {Kind = 'toggle', Apply = Apply}
 
+		Render(Default)
+
+		if Options.callback then
+    		pcall(Options.callback, Default)
+		end
+	
         local Click_Button = Create_Instance('TextButton', {
             Size = UDim2.fromScale(1, 1), 
             BackgroundTransparency = 1, 
@@ -1481,7 +1575,11 @@ function Library:Create_Tab(Name, Icon)
             return math.clamp(Number, Min, Max)
         end
 
-        local Default = Snap(Options.default) or Min
+        local Saved_Value = self.Saved_Config and self.Saved_Config[Flag]
+		local Default = Snap(Saved_Value)
+		if Default == nil then
+   	 		Default = Snap(Options.default) or Min
+		end
 
         local Row = Row_Frame(56, Options.section)
         Row.Name = Flag
@@ -1594,13 +1692,18 @@ function Library:Create_Tab(Name, Icon)
         end)
         Set_Value(Default, true, true)
 
+		if Options.callback then
+    		pcall(Options.callback, Default)
+		end
+
         Register_Search(Row, Options.name or Flag)
     end
 
     function Tab.Create_Dropdown(Options)
     	local Flag = Options.flag or Options.name
     	local Choices = Options.options or {}
-    	local Default = Options.default or Choices[1]
+    	local Saved_Value = self.Saved_Config and self.Saved_Config[Flag]
+		local Default = Saved_Value ~= nil and Saved_Value or (Options.default or Choices[1])
     	local Row_Height = 28
     	local Max_List = math.min(#Choices, 5)
     	local Needs_Scroll = #Choices > 5
@@ -1735,11 +1838,13 @@ function Library:Create_Tab(Name, Icon)
                 Create_Tween(Item, 0.12, {BackgroundTransparency = 1}) 
             end)
             Item.MouseButton1Click:Connect(function()
-                Set_Value(Choice, false)
-                self:Status('Selected: ' .. tostring(Choice), Theme.Accent, 1.2)
-                self:Autosave()
-                Close()
-            end)
+    			Set_Value(Choice, false)
+    			self:Status('Selected: ' .. tostring(Choice), Theme.Accent, 1.2)
+    			self:Autosave()
+    			if Options.trigger ~= false then
+       				Close()
+    			end
+			end)
         end
 
         Box.MouseButton1Click:Connect(Open_List)
@@ -1747,12 +1852,23 @@ function Library:Create_Tab(Name, Icon)
         self.Flags[Flag] = Default
         self.Control_Objects[Flag] = {Kind = 'dropdown', Apply = function(Value, Silent) Set_Value(Value, Silent) end}
 
+		Set_Value(Default, true)
+
+		if Options.callback then
+    		pcall(Options.callback, Default)
+		end
+
         Register_Search(Row, Options.name or Flag)
     end
 
     function Tab.Create_Keybind(Options)
         local Flag = Options.flag or Options.name
-        local Default = Options.default or Enum.KeyCode.None
+        local Saved_Value = self.Saved_Config and self.Saved_Config[Flag]
+		local Default = Options.default or Enum.KeyCode.None
+
+		if Saved_Value ~= nil then
+    		Default = Enum.KeyCode[tostring(Saved_Value)] or Default
+		end
 
         local Row = Row_Frame(46, Options.section)
         Row.Name = Flag
@@ -1821,12 +1937,26 @@ function Library:Create_Tab(Name, Icon)
             end,
         }
 
+		Set_Key(Default, true)
+
+		if Options.callback then
+    		pcall(Options.callback, Default)
+		end
+
         Register_Search(Row, Options.name or Flag)
     end
 
     function Tab.Create_Color_Picker(Options)
         local Flag = Options.flag or Options.name
-        local Default = Options.default or Theme.Accent
+        local Saved_Value = self.Saved_Config and self.Saved_Config[Flag]
+		local Default = Options.default or Theme.Accent
+
+		if Saved_Value ~= nil then
+    		local Saved_Color = typeof(Saved_Value) == 'Color3' and Saved_Value or Hex_To_Color(Saved_Value)
+    		if Saved_Color then
+        		Default = Saved_Color
+    		end
+		end
 
         local Row = Row_Frame(46, Options.section)
         Row.Name = Flag
@@ -2014,6 +2144,12 @@ function Library:Create_Tab(Name, Icon)
                 end
             end,
         }
+		self.Control_Objects[Flag].Apply(Default, true)
+
+		if Options.callback then
+    		pcall(Options.callback, Default)
+		end
+
         Register_Search(Row, Options.name or Flag)
     end
     return Tab
