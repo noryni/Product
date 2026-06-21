@@ -59,7 +59,7 @@ function Library:exist()
 end
 
 if getgenv then
-    getgenv().Loaded = true
+    getgenv().Noryn_Loaded = true
     if getgenv().Config_Enabled == nil then getgenv().Config_Enabled = false end
 end
 
@@ -167,6 +167,19 @@ local function Create_Corner(Parent, Radius)
     }, Parent)
 end
 
+
+local Assets = Create_Instance('Folder', {
+    Name = 'Assets',
+}, Parent)
+
+local function Create_Sound(Parent, Id, Volume)
+    return Create_Instance('Sound', {
+        Name = 'Vfx',
+        SoundId = 'rbxassetid://' .. tostring(Id),
+        Volume = Volume or 1,
+    }, Assets)
+end
+
 local function Create_Stroke(Parent, Color, Thickness, Transparency)
     return Create_Instance('UIStroke', {
         Color = Color or Theme.Border,
@@ -271,7 +284,6 @@ function Library.New()
     local self = setmetatable({}, Library)
 
     Library:clear()
-
 	self.Saved_Config = {}
 
 	if not (getgenv and getgenv().Config_Enabled == false) then
@@ -285,9 +297,7 @@ function Library.New()
     local Version = (getgenv and getgenv().Product_Version) or ''
 
     local Existing = CoreGui:FindFirstChild('Noryn')
-    if Existing then
-        Existing:Destroy()
-    end
+    if Existing then Existing:Destroy() end
 
     local Screen_Gui = Create_Instance('ScreenGui', {
         Name = 'Noryn',
@@ -296,7 +306,15 @@ function Library.New()
         ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
     }, CoreGui)
 
+    local Sounds = {
+        ['Tab'] = 6895079853,
+        ['Minimize'] = 96591611478915
+    }
+
     self.Gui = Screen_Gui
+	local Volume = (getgenv and getgenv().Clicks_Volume_Enabled) or 1
+	self.Tab_Sound = Create_Sound(Screen_Gui, Sounds['Tab'], Volume)
+    self.Minimize_Sound = Create_Sound(Screen_Gui, Sounds['Minimize'], Volume)
 
     local Main_Panel = Create_Instance('CanvasGroup', {
         Name = 'Panel',
@@ -903,6 +921,10 @@ function Library:Switch_Tab(Index)
     if Index == self.Active_Tab or not self.Tabs[Index] then return end
     if self.Switching then return end
     if self.Open_Dropdown then self.Open_Dropdown() end
+	if self.Tab_Sound then
+    	self.Tab_Sound.Volume = (getgenv and getgenv().Clicks_Volume_Enabled) or 0.5
+    	self.Tab_Sound:Play()
+	end
 
     self.Switching = true
     local Out_Pane = self.Tabs[self.Active_Tab]
@@ -1001,6 +1023,10 @@ end
 
 function Library:Toggle_Minimize()
     if self.Tweening then return end
+    if self.Minimize_Sound then
+    	self.Minimize_Sound.Volume = (getgenv and getgenv().Clicks_Volume_Enabled) or 0.5
+    	self.Minimize_Sound:Play()
+	end
     self.Minimized = not self.Minimized
     Create_Tween(self.Panel, 0.28, {Size = UDim2.fromOffset(660, self.Minimized and 92 or 420)})
     self.Body.Visible, self.Footer.Visible = not self.Minimized, not self.Minimized
@@ -1563,17 +1589,20 @@ function Library:Create_Tab(Name, Icon)
         local Min = Options.min or 0
         local Max = Options.max or 100
         local Step = Options.step or 0
-        local Decimals = Options.decimals or 0
+        local Decimals = Options.decimals or math.max(0, -math.floor(math.log10(Step or 1)))
         local Suffix = Options.suffix or ''
 
         local function Snap(Value)
-            local Number = tonumber(Value)
-            if Number == nil then return nil end
-            if Step and Step > 0 then Number = Min + math.floor((Number - Min) / Step + 0.5) * Step end
-            local Multiplier = 10 ^ Decimals
-            Number = math.floor(Number * Multiplier + 0.5) / Multiplier
-            return math.clamp(Number, Min, Max)
-        end
+    		local Number = tonumber(Value)
+    		if not Number then return nil end
+    		if Step and Step > 0 then
+        		local Steps = math.floor((Number - Min) / Step + 0.5)
+        		Number = Min + Steps * Step
+    		end
+    		local Multiplier = 10 ^ Decimals
+    		Number = math.floor(Number * Multiplier + 0.5) / Multiplier
+    		return math.clamp(Number, Min, Max)
+		end
 
         local Saved_Value = self.Saved_Config and self.Saved_Config[Flag]
 		local Default = Snap(Saved_Value)
@@ -1649,7 +1678,6 @@ function Library:Create_Tab(Name, Icon)
 			end
 		end
 
-
         self.Flags[Flag] = Default
         self.Control_Objects[Flag] = {Kind = 'slider', Apply = function(Value, Silent) Set_Value(Value, Silent, false) end}
 
@@ -1695,7 +1723,6 @@ function Library:Create_Tab(Name, Icon)
 		if Options.callback then
     		pcall(Options.callback, Default)
 		end
-
         Register_Search(Row, Options.name or Flag)
     end
 
@@ -2169,3 +2196,5 @@ function Library:Save()
 end
 
 return Library
+
+--// © 2026 Noryn — All Rights Reserved.
