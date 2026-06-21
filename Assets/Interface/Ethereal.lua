@@ -308,8 +308,6 @@ function Library.New()
 
     self.Gui = Screen_Gui
 	local Volume = (getgenv and getgenv().Clicks_Volume_Enabled) or 1
-	self.Tab_Sound = Create_Sound(Screen_Gui, Sounds['Tab'], Volume)
-    self.Minimize_Sound = Create_Sound(Screen_Gui, Sounds['Minimize'], Volume)
 
     local Main_Panel = Create_Instance('CanvasGroup', {
         Name = 'Panel',
@@ -512,6 +510,7 @@ function Library.New()
     Create_Corner(Minimize_Button, 6)
     Create_Stroke(Minimize_Button, Theme.Border, 1, 0.4)
     self.Minimize_Button = Minimize_Button
+	self.Minimize_Sound = Create_Sound(Minimize_Button, Sounds['Minimize'], Volume)
 
     Minimize_Button.MouseButton1Click:Connect(function() 
         self:Toggle_Minimize() 
@@ -547,6 +546,7 @@ function Library.New()
     }, Tab_Bar)
 
     self.Tab_Bar = Tab_Bar
+	self.Tab_Sound = Create_Sound(Tab_Bar, Sounds['Tab'], Volume)
 
     local Search_Bar = Create_Instance('Frame', {
         Name = 'Search Bar',
