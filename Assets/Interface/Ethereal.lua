@@ -273,7 +273,7 @@ local function Load_Config()
     return nil
 end
 
-print('Interface by - ©noryni (Github)')
+print('Interface by - ©noryni (Github)') --// [Attribution required if removed]
 
 function Library.New()
     local self = setmetatable({}, Library)
@@ -347,15 +347,18 @@ function Library.New()
         }, Title_Bar)
 
         Drag_Handle.InputBegan:Connect(function(Input)
+            if (getgenv and getgenv().Interface_Drag_Enabled) == false then return end
             if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
                 Dragging, Drag_Start, Start_Position = true, Input.Position, Main_Panel.Position
             end
-        end)
+       	end)
+
         Drag_Handle.InputEnded:Connect(function(Input)
             if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then 
                 Dragging = false 
             end
         end)
+
         UserInputService.InputChanged:Connect(function(Input)
             if not Dragging then return end
             if Input.UserInputType ~= Enum.UserInputType.MouseMovement and Input.UserInputType ~= Enum.UserInputType.Touch then 
@@ -376,10 +379,18 @@ function Library.New()
         end)
     end
 
-	task.spawn(function()
+	    task.spawn(function()
         local Was_Free = (getgenv and getgenv().Freedom_Enabled) == true
+        local Was_Drag_Enabled = (getgenv and getgenv().Interface_Drag_Enabled) ~= false
         while Main_Panel and Main_Panel.Parent do
             local Freedom = (getgenv and getgenv().Freedom_Enabled) == true
+            local Drag_Enabled = (getgenv and getgenv().Interface_Drag_Enabled) ~= false
+            if Was_Drag_Enabled and not Drag_Enabled then
+                Create_Tween(Main_Panel, 0.4, {
+                    Position = UDim2.fromScale(0.5, 0.5),
+                }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+            end
+            Was_Drag_Enabled = Drag_Enabled
             if Was_Free and not Freedom then
                 local Viewport = Screen_Gui.AbsoluteSize
                 local Half_W = Main_Panel.AbsoluteSize.X / 2
@@ -479,7 +490,7 @@ function Library.New()
         ZIndex = 12,
     }, Title_Bar)
 
-    if Device['Mobile'] then
+    if not Device['Mobile'] then
         local Close_Button = Create_Instance('TextButton', {
             AnchorPoint = Vector2.new(1, 0.5), 
             Position = UDim2.new(1, -14, 0.5, 0),
@@ -502,7 +513,7 @@ function Library.New()
     local Minimize_Button = Create_Instance('TextButton', {
         Name = 'Minimize',
         AnchorPoint = Vector2.new(1, 0.5),
-        Position = UDim2.new(1, Device['Mobile'] and -56 or -14, 0.5, 0),
+        Position = UDim2.new(1, not Device['Mobile'] and -56 or -14, 0.5, 0),
         Size = UDim2.fromOffset(72, 26), 
         BackgroundColor3 = Theme.Panel_2,
         BorderSizePixel = 0, Font = Enum.Font.Code, 
@@ -514,24 +525,32 @@ function Library.New()
 
     Create_Corner(Minimize_Button, 6)
     Create_Stroke(Minimize_Button, Theme.Border, 1, 0.4)
+
     self.Minimize_Button = Minimize_Button
 	self.Minimize_Sound = Create_Sound(Minimize_Button, Sounds['Minimize'], Volume)
 
     Minimize_Button.MouseButton1Click:Connect(function() 
         self:Toggle_Minimize() 
     end)
+
     Minimize_Button.MouseEnter:Connect(function() 
         Create_Tween(Minimize_Button, 0.12, {BackgroundColor3 = Color3.fromRGB(30,18,22), TextColor3 = Theme.Accent}) 
     end)
+
     Minimize_Button.MouseLeave:Connect(function() 
         Create_Tween(Minimize_Button, 0.12, {BackgroundColor3 = Theme.Panel_2, TextColor3 = Theme.Muted}) 
     end)
 
-    local Tab_Bar = Create_Instance('Frame', {
+    local Tab_Bar = Create_Instance('ScrollingFrame', {
         Name = 'Tabs',
         Position = UDim2.new(0, 0, 0, 46), 
         Size = UDim2.new(1, 0, 0, 38),
         BackgroundTransparency = 1, 
+        BorderSizePixel = 0,
+        ScrollingDirection = Enum.ScrollingDirection.X,
+        ScrollBarThickness = 0,
+        CanvasSize = UDim2.new(0, 0, 0, 0),
+        AutomaticCanvasSize = Enum.AutomaticSize.X,
         ZIndex = 11,
     }, Main_Panel)
 
@@ -624,13 +643,16 @@ function Library.New()
     Search_Input.Focused:Connect(function() 
         Create_Tween(Search_Stroke, 0.12, {Color = Theme.Accent, Transparency = 0}) 
     end)
+
     Search_Input.FocusLost:Connect(function() 
         Create_Tween(Search_Stroke, 0.12, {Color = Theme.Border, Transparency = 0.3}) 
     end)
+
     Search_Input:GetPropertyChangedSignal('Text'):Connect(function()
         Clear_Button.Visible = Search_Input.Text ~= ''
         self:Search(Search_Input.Text)
     end)
+    
     Clear_Button.MouseButton1Click:Connect(function()
         Search_Input.Text = ''
     end)
@@ -685,12 +707,13 @@ function Library.New()
     	}, Footer)
 
     	Footer_Drag.InputBegan:Connect(function(Input)
-        	if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-            	Footer_Dragging = true
-            	Footer_Drag_Start = Input.Position
-            	Footer_Start_Position = Main_Panel.Position
-        	end
-    	end)
+            if (getgenv and getgenv().Interface_Drag_Enabled) == false then return end
+            if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+                Footer_Dragging = true
+                Footer_Drag_Start = Input.Position
+                Footer_Start_Position = Main_Panel.Position
+            end
+        end)
 
     	Footer_Drag.InputEnded:Connect(function(Input)
         	if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
@@ -758,30 +781,27 @@ function Library.New()
         ZIndex = 14,
     }, Footer)
 
-    if Device['Mobile'] then
-        local Float_Button = Create_Instance('TextButton', {
+    if not Device['Mobile'] then
+        local Float_Button = Create_Instance('ImageButton', {
             Name = 'Mobile', 
             AnchorPoint = Vector2.new(0.5, 1),
             Position = UDim2.new(0.5, 0, 1, -24), 
-            Size = UDim2.fromOffset(60, 37),
+            Size = UDim2.fromOffset(70, 35),
             BackgroundColor3 = Color3.fromRGB(18, 10, 12), 
             BorderSizePixel = 0,
-            Font = Enum.Font.Code, 
-            TextSize = 13, 
-            Text = Title or 'Open',
-            TextColor3 = Theme.Accent, 
+            Image = 'rbxassetid://131149619650660',
+            ImageColor3 = Theme.Accent,
+            ImageTransparency = 1,
+            ScaleType = Enum.ScaleType.Fit,
             ZIndex = 100, 
             Visible = false, 
             BackgroundTransparency = 1,
-            TextTransparency = 1,
             AutoButtonColor = false,
         }, Screen_Gui)
 
         Create_Corner(Float_Button, 8)
-        local Float_Stroke = Create_Stroke(Float_Button, Theme.Accent, 1, 1)
 
         self.Float_Button = Float_Button
-        self.Float_Stroke = Float_Stroke
 
         local Dragging, Drag_Start, Start_Position, Did_Drag = false, nil, nil, false
         Float_Button.InputBegan:Connect(function(Input)
@@ -789,11 +809,13 @@ function Library.New()
                 Dragging, Did_Drag, Drag_Start, Start_Position = true, false, Input.Position, Float_Button.Position
             end
         end)
+
         Float_Button.InputEnded:Connect(function(Input)
             if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then 
                 Dragging = false 
             end
         end)
+
         UserInputService.InputChanged:Connect(function(Input)
             if not Dragging then return end
             if Input.UserInputType ~= Enum.UserInputType.MouseMovement and Input.UserInputType ~= Enum.UserInputType.Touch then 
@@ -939,6 +961,7 @@ function Library:Switch_Tab(Index)
     Out_Pane.Visible = true
     Out_Pane.GroupTransparency = 0
     Out_Pane.Position = UDim2.fromScale(0, 0)
+
     Create_Tween(Out_Pane, 0.16, {GroupTransparency = 1, Position = UDim2.fromScale(0, -0.03)}, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
 
     local Previous = self.Active_Tab
@@ -951,6 +974,11 @@ function Library:Switch_Tab(Index)
         In_Pane.GroupTransparency = 1
         In_Pane.Position = UDim2.fromScale(0, 0.04)
         Create_Tween(In_Pane, 0.26, {GroupTransparency = 0, Position = UDim2.fromScale(0, 0)}, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+        for _, Descendant in ipairs(In_Pane:GetDescendants()) do
+            if Descendant:GetAttribute('IsDivider') then
+                Descendant:SetAttribute('Replay', tick())
+            end
+        end
         task.delay(0.28, function() self.Switching = false end)
     end)
 
@@ -962,7 +990,12 @@ function Library:Switch_Tab(Index)
             TextColor3 = Is_Active and Theme.Accent or Theme.Dim,
         })
         local Underline = Button:FindFirstChild('Underline')
-        if Underline then Create_Tween(Underline, 0.16, {BackgroundTransparency = Is_Active and 0 or 1}) end
+        if Underline then
+            Create_Tween(Underline, 0.22, {
+                BackgroundTransparency = Is_Active and 0 or 1,
+                Size = Is_Active and UDim2.new(1, -8, 0, 2) or UDim2.new(0, 0, 0, 2),
+            }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+        end
     end
     self.Active_Tab = Index
 end
@@ -999,7 +1032,6 @@ function Library:Hide()
         task.delay(0.22, function()
             self.Panel.Visible = false
             if self.Float_Button then 
-                self.Float_Button.Text = 'Open'
                 self:Fade_Float(true) 
             end
             self.Tweening, self.Minimized = false, false
@@ -1012,11 +1044,9 @@ function Library:Fade_Float(Visible)
     if not Float then return end
     if Visible then
         Float.Visible = true
-        Create_Tween(Float, 0.22, {BackgroundTransparency = 0, TextTransparency = 0})
-        if self.Float_Stroke then Create_Tween(self.Float_Stroke, 0.22, {Transparency = 0.5}) end
+        Create_Tween(Float, 0.22, {BackgroundTransparency = 0, ImageTransparency = 0})
     else
-        Create_Tween(Float, 0.18, {BackgroundTransparency = 1, TextTransparency = 1})
-        if self.Float_Stroke then Create_Tween(self.Float_Stroke, 0.18, {Transparency = 1}) end
+        Create_Tween(Float, 0.18, {BackgroundTransparency = 1, ImageTransparency = 1})
         task.delay(0.20, function()
             if Float then Float.Visible = false end
         end)
@@ -1046,7 +1076,8 @@ function Library:Create_Tab(Name, Icon)
     local Button_Width = Icon and 90 or 70
     local Tab_Button = Create_Instance('TextButton', {
         Name = Name, 
-        Size = UDim2.fromOffset(Button_Width, 28),
+        Size = UDim2.fromOffset(0, 28),
+        AutomaticSize = Enum.AutomaticSize.X,
         BackgroundColor3 = Color3.fromRGB(30, 16, 20),
         BackgroundTransparency = Is_First and 0 or 1, BorderSizePixel = 0,
         Font = Enum.Font.Code, 
@@ -1059,6 +1090,12 @@ function Library:Create_Tab(Name, Icon)
     }, self.Tab_Bar)
 
     Create_Corner(Tab_Button, 6)
+
+	Create_Corner(Tab_Button, 6)
+    Create_Instance('UIPadding', {
+        PaddingLeft = UDim.new(0, 12),
+        PaddingRight = UDim.new(0, 12),
+    }, Tab_Button)
 
     if Icon and Icon ~= '' then
         Tab_Button.Text = '  ' .. Name
@@ -1079,9 +1116,9 @@ function Library:Create_Tab(Name, Icon)
 
     local Underline = Create_Instance('Frame', {
         Name = 'Underline', 
-        AnchorPoint = Vector2.new(0, 1),
-        Position = UDim2.new(0, 4, 1, -1), 
-        Size = UDim2.new(1, -8, 0, 2),
+        AnchorPoint = Vector2.new(0.5, 1),
+        Position = UDim2.new(0.5, 0, 1, -1), 
+        Size = Is_First and UDim2.new(1, -8, 0, 2) or UDim2.new(0, 0, 0, 2),
         BackgroundColor3 = Theme.Accent, 
         BackgroundTransparency = Is_First and 0 or 1,
         BorderSizePixel = 0, 
@@ -1377,22 +1414,24 @@ function Library:Create_Tab(Name, Icon)
     end
 
 	function Tab.Create_Divider(Options)
-    	Options = Options or {}
+        Options = Options or {}
 
-    	local Column = Target_Column(Options.section)
-    	local Order  = Next_Order(Options.section)
+        local Column = Target_Column(Options.section)
+        local Order  = Next_Order(Options.section)
 
-    	local Divider = Create_Instance('Frame', {
-			Name = 'Divider',
-        	Size = UDim2.new(1, 0, 0, 1),
-        	BackgroundColor3 = Options.color or Color3.fromRGB(255, 255, 255),
-        	BorderSizePixel = 0,
-        	LayoutOrder = Order,
-        	ZIndex = 15,
-    	}, Column)
+        local Divider = Create_Instance('Frame', {
+            Name = 'Divider',
+            AnchorPoint = Vector2.new(0.5, 0.5),
+            Position = UDim2.fromScale(0.5, 0.5),
+            Size = UDim2.new(0, 0, 0, 1),
+            BackgroundColor3 = Options.color or Color3.fromRGB(255, 255, 255),
+            BorderSizePixel = 0,
+            LayoutOrder = Order,
+            ZIndex = 15,
+        }, Column)
 
-    	Create_Instance('UIGradient', {
-        	Color = ColorSequence.new({
+        Create_Instance('UIGradient', {
+            Color = ColorSequence.new({
             ColorSequenceKeypoint.new(0, Color3.fromRGB(12, 12, 14)),   
             ColorSequenceKeypoint.new(0.15, Options.color or Color3.fromRGB(203, 104, 118)),
             ColorSequenceKeypoint.new(0.85, Options.color or Color3.fromRGB(203, 104, 118)),
@@ -1401,6 +1440,16 @@ function Library:Create_Tab(Name, Icon)
             Transparency = NumberSequence.new(0),
             Rotation = 0,
         }, Divider)
+
+        local function Play()
+            Divider.Size = UDim2.new(0, 0, 0, 1)
+            Create_Tween(Divider, 0.35, {
+                Size = UDim2.new(1, 0, 0, 1),
+            }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+        end
+        Divider:SetAttribute('IsDivider', true)
+        Divider:GetAttributeChangedSignal('Replay'):Connect(function() Play() end)
+        task.spawn(function() task.wait(0.05) Play() end)
         return Divider
     end
 
@@ -2064,6 +2113,7 @@ function Library:Create_Tab(Name, Icon)
         local White_Gradient = Create_Instance('Frame', {Size = UDim2.fromScale(1, 1), BackgroundColor3 = Color3.new(1, 1, 1), BorderSizePixel = 0, ZIndex = 20}, SV_Box)
         Create_Corner(White_Gradient, 4)
         Create_Instance('UIGradient', {Transparency = NumberSequence.new(0, 1)}, White_Gradient)
+        
         local Black_Gradient = Create_Instance('Frame', {Size = UDim2.fromScale(1, 1), BackgroundColor3 = Color3.new(0, 0, 0), BorderSizePixel = 0, ZIndex = 21}, SV_Box)
         Create_Corner(Black_Gradient, 4)
         Create_Instance('UIGradient', {Rotation = 90, Transparency = NumberSequence.new(1, 0)}, Black_Gradient)
@@ -2140,6 +2190,7 @@ function Library:Create_Tab(Name, Icon)
             SV_Cursor.Position = UDim2.fromScale(Alpha_X, Alpha_Y)
             Recolor(false)
         end
+
         local function Update_Hue(Pixel_Y)
             local Alpha_Y = math.clamp((Pixel_Y - Hue_Bar.AbsolutePosition.Y) / math.max(Hue_Bar.AbsoluteSize.Y, 1), 0, 1)
             Hue = Alpha_Y
@@ -2155,6 +2206,7 @@ function Library:Create_Tab(Name, Icon)
                 SV_Dragging = true; Update_SV(Input.Position.X, Input.Position.Y)
             end
         end)
+
         Hue_Hit.InputBegan:Connect(function(Input)
             if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
                 Hue_Dragging = true; Update_Hue(Input.Position.Y)
@@ -2166,6 +2218,7 @@ function Library:Create_Tab(Name, Icon)
             if SV_Dragging then Update_SV(Input.Position.X, Input.Position.Y) end
             if Hue_Dragging then Update_Hue(Input.Position.Y) end
         end)
+        
         UserInputService.InputEnded:Connect(function(Input)
             if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
                 if SV_Dragging or Hue_Dragging then self:Autosave() end
@@ -2213,4 +2266,4 @@ end
 
 return Library
 
---// © 2026 Noryn — All Rights Reserved
+--// © 2026 Noryn — All Rights Reserved.
