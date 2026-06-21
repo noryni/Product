@@ -308,7 +308,7 @@ function Library.New()
 
     local Sounds = {
         ['Tab'] = 6895079853,
-        ['Minimize'] = 96591611478915
+        ['Minimize'] = 104184340183231
     }
 
     self.Gui = Screen_Gui
