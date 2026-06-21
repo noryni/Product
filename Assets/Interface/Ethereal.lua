@@ -1098,9 +1098,9 @@ function Library:Create_Tab(Name, Icon)
         Size = UDim2.new(1, 0, 0, 0),
         AutomaticSize = Enum.AutomaticSize.Y, 
         BackgroundTransparency = 1,
-        GroupTransparency = Is_First and 0 or 1,
+        GroupTransparency = 1,
         Visible = Is_First, 
-        Position = UDim2.fromScale(0, 0), 
+        Position = Is_First and UDim2.fromScale(0, 0.04) or UDim2.fromScale(0, 0),
         ZIndex = 12,
     }, self.Body)
 
@@ -1120,6 +1120,16 @@ function Library:Create_Tab(Name, Icon)
     }, Pane)
 
     table.insert(self.Tabs, Pane)
+
+	if Is_First then
+    	task.spawn(function()
+        	task.wait(0.05)
+            Create_Tween(Pane, 0.30, {
+                GroupTransparency = 0,
+                Position = UDim2.fromScale(0, 0),
+            }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+        end)
+    end
 
     local function Make_Column(Order_Number)
         local Column = Create_Instance('Frame', {
