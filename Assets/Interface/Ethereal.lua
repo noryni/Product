@@ -445,9 +445,10 @@ function Library.New()
         local Row_Count = 3
         local Column_Count = 3
         local Last_Time = tick()
-        Connection.Icon_Animation = RunService.Heartbeat:Connect(function()
+        local Animation_Connection
+        Animation_Connection = RunService.Heartbeat:Connect(function()
             if not Animated or not Animated.Parent then 
-                Connection.Icon_Animation = nil
+                Animation_Connection:Disconnect() 
                 return 
             end
             local Real_Time = tick()
