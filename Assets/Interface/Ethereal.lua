@@ -1214,9 +1214,14 @@ function Library:Create_Tab(Name, Icon)
         Order_Left += 1; return Order_Left
     end
 
-    local function Register_Search(Object, Search_Name)
-        table.insert(self.Search_Items, {Object = Object, Name = tostring(Search_Name or ''), Tab_Index = Tab_Index})
-    end
+    local function Register_Search(Object, Search_Name, Search_Info, Search_Flag)
+    	local Combined = table.concat({
+        	tostring(Search_Name or ''),
+        	tostring(Search_Info or ''),
+        	tostring(Search_Flag or ''),
+    	}, ' ')
+    	table.insert(self.Search_Items, {Object = Object, Name = Combined, Tab_Index = Tab_Index})
+	end
 
     local function Row_Frame(Height, Section)
         local Row = Create_Instance('Frame', {
@@ -1412,7 +1417,7 @@ function Library:Create_Tab(Name, Icon)
             ZIndex = 16,
         }, Row)
 
-        Register_Search(Row, Options.title)
+        Register_Search(Row, Options.title, Options.content, Options.flag)
     end
 
 	function Tab.Create_Divider(Options)
@@ -1824,7 +1829,7 @@ function Library:Create_Tab(Name, Icon)
             end,
         }
 
-        Register_Search(Diddy, Options.name or Flag)
+        Register_Search(Diddy, Options.name or Flag, nil, Flag)
 
         if Options.callback and not Initialized then
             Initialized = true
@@ -1895,7 +1900,7 @@ function Library:Create_Tab(Name, Icon)
             if Options.callback then pcall(Options.callback) end
         end)
 
-        Register_Search(Row, Options.name)
+        Register_Search(Row, Options.name, Options.info, Options.flag)
     end
 
     function Tab.Create_Toggle(Options)
@@ -1986,7 +1991,7 @@ function Library:Create_Tab(Name, Icon)
             self:Autosave()
         end)
 
-        Register_Search(Row, Options.name or Flag)
+        Register_Search(Row, Options.name or Flag, Options.info, Flag)
     end
 
     function Tab.Create_Slider(Options)
@@ -2096,7 +2101,7 @@ function Library:Create_Tab(Name, Icon)
         local Hit_Area = Create_Instance('TextButton', {
             AnchorPoint = Vector2.new(0.5, 0.5), 
             Position = UDim2.fromScale(0.5, 0.5),
-            Size = UDim2.new(1, 0, 0, 25), 
+            Size = UDim2.new(1.09, 0, 0, 25), 
             BackgroundTransparency = 1, 
             Text = '',
             ZIndex = 19, 
@@ -2132,7 +2137,7 @@ function Library:Create_Tab(Name, Icon)
     		pcall(Options.callback, Default)
 		end
 
-        Register_Search(Row, Options.name or Flag)
+        Register_Search(Row, Options.name or Flag, nil, Flag)
     end
 
     function Tab.Create_Dropdown(Options)
