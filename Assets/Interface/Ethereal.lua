@@ -1474,7 +1474,7 @@ function Library:Create_Tab(Name, Icon)
             Name = 'Picture',
             Size = UDim2.fromScale(1, 1),
             BackgroundTransparency = 1,
-            Image = Options.image or '',
+            Image = 'rbxassetid://' .. (Options.image or '137740310403393'),
             ScaleType = Enum.ScaleType.Fit,
             ZIndex = 16,
         }, Row)
