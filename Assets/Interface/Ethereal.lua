@@ -593,7 +593,7 @@ function Library.New()
 
     Create_Corner(Search_Box, 6)
 
-    local Search_Stroke = Create_Stroke(Search_Box, Theme.Border, 1, 0.3)
+    local Search_Stroke = Create_Stroke(Search_Box, Theme.Border, 1, 0.5)
 
     Create_Instance('TextLabel', {
         Name = 'Glyph',
@@ -1232,7 +1232,7 @@ function Library:Create_Tab(Name, Icon)
             ZIndex = 15,
         }, Target_Column(Section))
         Create_Corner(Row, 8)
-        local Row_Stroke = Create_Stroke(Row, Theme.Border, 1, 0.3)
+        local Row_Stroke = Create_Stroke(Row, Theme.Border, 1, 0.5)
         return Row, Row_Stroke
     end
 
@@ -1278,7 +1278,7 @@ function Library:Create_Tab(Name, Icon)
 
             Create_Instance('UIPadding', {PaddingLeft = UDim.new(0, 6), PaddingRight = UDim.new(0, 6)}, Badge_Label)
             Create_Corner(Badge_Label, 4)
-            Create_Stroke(Badge_Label, Badge_Color.Border, 1, 0.3)
+            Create_Stroke(Badge_Label, Badge_Color.Border, 1, 0.5)
         end
     end
 
@@ -1342,7 +1342,7 @@ function Library:Create_Tab(Name, Icon)
         }, Target_Column(Options.section))
         
         Create_Corner(Row, 8)
-        Create_Stroke(Row, Theme.Border, 1, 0.3)
+        Create_Stroke(Row, Theme.Border, 1, 0.5)
 
         Create_Instance('UIPadding', {
             PaddingLeft = UDim.new(0, 14), 
@@ -1397,7 +1397,7 @@ function Library:Create_Tab(Name, Icon)
             }, Head)
             Create_Instance('UIPadding', {PaddingLeft = UDim.new(0, 6), PaddingRight = UDim.new(0, 6)}, Badge_Label)
             Create_Corner(Badge_Label, 4)
-            Create_Stroke(Badge_Label, Badge_Color.Border, 1, 0.3)
+            Create_Stroke(Badge_Label, Badge_Color.Border, 1, 0.5)
         end
 
         Create_Instance('TextLabel', {
@@ -1474,7 +1474,7 @@ function Library:Create_Tab(Name, Icon)
         }, Target_Column(Options.section))
 
         Create_Corner(Row, 8)
-        Create_Stroke(Row, Theme.Border, 1, 0.3)
+        Create_Stroke(Row, Theme.Border, 1, 0.5)
 
         local Picture = Create_Instance('ImageLabel', {
             Name = 'Picture',
@@ -1572,7 +1572,7 @@ function Library:Create_Tab(Name, Icon)
         }, Diddy)
 
         Create_Corner(List, 6)
-        Create_Stroke(List, Theme.Border, 1, 0.3)
+        Create_Stroke(List, Theme.Border, 1, 0.5)
 
         Create_Instance('UIListLayout', {
             Padding = UDim.new(0, 2),
@@ -2174,7 +2174,7 @@ function Library:Create_Tab(Name, Icon)
     	}, Row)
 
     	Create_Corner(Box, 6)
-    	Create_Stroke(Box, Theme.Border, 1, 0.3)
+    	Create_Stroke(Box, Theme.Border, 1, 0.5)
 
     	local Selected_Label = Create_Instance('TextLabel', {
         	Position = UDim2.fromOffset(10, 0), 
@@ -2217,7 +2217,7 @@ function Library:Create_Tab(Name, Icon)
 		}, Row)
 
     	Create_Corner(List, 6)
-    	Create_Stroke(List, Theme.Border, 1, 0.3)
+    	Create_Stroke(List, Theme.Border, 1, 0.5)
     	Create_Instance('UIListLayout', {SortOrder = Enum.SortOrder.LayoutOrder}, List)
     	Create_Instance('UIPadding', {PaddingTop = UDim.new(0, 3), PaddingBottom = UDim.new(0, 3)}, List)
 
@@ -2341,7 +2341,7 @@ function Library:Create_Tab(Name, Icon)
         }, Row)
 
         Create_Corner(Box, 6)
-        local Box_Stroke = Create_Stroke(Box, Theme.Border, 1, 0.3)
+        local Box_Stroke = Create_Stroke(Box, Theme.Border, 1, 0.5)
 
         local Current = Default
 
@@ -2393,6 +2393,172 @@ function Library:Create_Tab(Name, Icon)
         Register_Search(Row, Options.name or Flag)
     end
 
+    function Tab.Create_Separator(Options)
+        Options = Options or {}
+        local Column = Target_Column(Options.section)
+        local Order = Next_Order(Options.section)
+
+        local Row = Create_Instance('Frame', {
+            Name = 'Separator',
+            Size = UDim2.new(1, 0, 0, 20),
+            BackgroundTransparency = 1,
+            LayoutOrder = Order,
+            ZIndex = 15,
+        }, Column)
+
+        local Left_Line = Create_Instance('Frame', {
+            AnchorPoint = Vector2.new(0, 0.5),
+            Position = UDim2.fromScale(0, 0.5),
+            Size = UDim2.new(0, 0, 0, 1),
+            BackgroundColor3 = Options.color or Theme.Border,
+            BorderSizePixel = 0,
+            ZIndex = 15,
+        }, Row)
+
+        local Right_Line = Create_Instance('Frame', {
+            AnchorPoint = Vector2.new(1, 0.5),
+            Position = UDim2.fromScale(1, 0.5),
+            Size = UDim2.new(0, 0, 0, 1),
+            BackgroundColor3 = Options.color or Theme.Border,
+            BorderSizePixel = 0,
+            ZIndex = 15,
+        }, Row)
+
+        local Label = Create_Instance('TextLabel', {
+            AnchorPoint = Vector2.new(0.5, 0.5),
+            Position = UDim2.fromScale(0.5, 0.5),
+            Size = UDim2.fromOffset(0, 20),
+            AutomaticSize = Enum.AutomaticSize.X,
+            BackgroundTransparency = 1,
+            Font = Enum.Font.Code,
+            TextSize = 11,
+            Text = Options.name or '',
+            TextColor3 = Options.color or Theme.Dim,
+            ZIndex = 16,
+        }, Row)
+
+        local function Play()
+            local Label_Width = Label.AbsoluteSize.X
+            local Total_Width = Row.AbsoluteSize.X
+            local Line_Width = (Total_Width - Label_Width - 12) / 2
+
+            Left_Line.Size = UDim2.new(0, 0, 0, 1)
+            Right_Line.Size = UDim2.new(0, 0, 0, 1)
+
+            Create_Tween(Left_Line, 0.35, {
+                Size = UDim2.new(0, Line_Width, 0, 1)
+            }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+
+            Create_Tween(Right_Line, 0.35, {
+                Size = UDim2.new(0, Line_Width, 0, 1)
+            }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+        end
+
+        Row:SetAttribute('IsDivider', true)
+        Row:GetAttributeChangedSignal('Replay'):Connect(function() Play() end)
+        task.spawn(function() task.wait(0.05) Play() end)
+
+        Register_Search(Row, '')
+        return Row
+    end
+
+    function Tab.Create_Textbox(Options)
+        local Flag = Options.flag or Options.name
+        local Saved_Value = self.Saved_Config and self.Saved_Config[Flag]
+        local Default = (Saved_Value ~= nil and tostring(Saved_Value)) or (Options.default or '')
+
+        local Has_Description = Options.info and Options.info ~= ''
+
+        local Row = Row_Frame(Has_Description and 52 or 40, Options.section)
+        Row.Name = Flag
+        Row_Header(Row, Options.name or Flag, Options.badge, Has_Description and 9 or 11)
+
+        if Has_Description then
+            Create_Instance('TextLabel', {
+                Position = UDim2.fromOffset(14, 30),
+                Size = UDim2.fromOffset(200, 14),
+                BackgroundTransparency = 1,
+                Font = Enum.Font.Code,
+                TextSize = 11,
+                Text = Options.info or '',
+                TextColor3 = Theme.Dim,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                TextTruncate = Enum.TextTruncate.AtEnd,
+                ZIndex = 16,
+            }, Row)
+        end
+
+        local Box = Create_Instance('Frame', {
+            AnchorPoint = Vector2.new(1, 0.5),
+            Position = UDim2.new(1, -14, 0.5, 0),
+            Size = UDim2.fromOffset(140, 26),
+            BackgroundColor3 = Theme.Not_Enabled,
+            BorderSizePixel = 0,
+            ZIndex = 17,
+        }, Row)
+
+        Create_Corner(Box, 6)
+        local Box_Stroke = Create_Stroke(Box, Theme.Border, 1, 0.5)
+
+        local Input = Create_Instance('TextBox', {
+            Position = UDim2.fromOffset(8, 0),
+            Size = UDim2.new(1, -16, 1, 0),
+            BackgroundTransparency = 1,
+            Font = Enum.Font.Code,
+            TextSize = 12,
+            Text = Default,
+            PlaceholderText = Options.placeholder or 'Enter text...',
+            PlaceholderColor3 = Theme.Dim,
+            TextColor3 = Theme.Text,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            TextTruncate = Enum.TextTruncate.AtEnd,
+            ClearTextOnFocus = Options.clear_on_focus == true,
+            ZIndex = 18,
+        }, Box)
+
+        local Current = Default
+        self.Flags[Flag] = Current
+
+        local function Set_Value(Text, Silent)
+            Current = Text
+            self.Flags[Flag] = Text
+            if not Silent and Options.callback then
+                pcall(Options.callback, Text)
+            end
+        end
+
+        Input.Focused:Connect(function()
+            Create_Tween(Box_Stroke, 0.12, {Color = Theme.Accent, Transparency = 1})
+        end)
+
+        Input.FocusLost:Connect(function(Enter_Pressed)
+            Create_Tween(Box_Stroke, 0.12, {Color = Theme.Border, Transparency = 1})
+            local Text = Input.Text
+            if Options.max_length then
+                Text = Text:sub(1, Options.max_length)
+                Input.Text = Text
+            end
+            Set_Value(Text, false)
+            self:Status((Options.name or Flag) .. ': ' .. tostring(Text), Theme.Accent, 1.2)
+            self:Autosave()
+        end)
+
+        self.Flags[Flag] = Default
+        self.Control_Objects[Flag] = {
+            Kind = 'textbox',
+            Apply = function(Value, Silent)
+                Input.Text = tostring(Value or '')
+                Set_Value(tostring(Value or ''), Silent)
+            end,
+        }
+
+        Set_Value(Default, true)
+        if Options.callback then
+            pcall(Options.callback, Default)
+        end
+        Register_Search(Row, Options.name or Flag, Flag)
+    end
+
     function Tab.Create_Color_Picker(Options)
         local Flag = Options.flag or Options.name
         local Saved_Value = self.Saved_Config and self.Saved_Config[Flag]
@@ -2425,7 +2591,7 @@ function Library:Create_Tab(Name, Icon)
         }, Row)
 
         Create_Corner(Swatch, 6)
-        Create_Stroke(Swatch, Theme.Border, 1, 0.3)
+        Create_Stroke(Swatch, Theme.Border, 1, 0.5)
 
         local Icon = Create_Instance('TextLabel', {
             AnchorPoint = Vector2.new(1, 0),
@@ -2449,7 +2615,7 @@ function Library:Create_Tab(Name, Icon)
         }, Row)
 
         Create_Corner(Picker, 6)
-        Create_Stroke(Picker, Theme.Border, 1, 0.3)
+        Create_Stroke(Picker, Theme.Border, 1, 0.5)
 
         local Pad = Create_Instance('Frame', {
             Position = UDim2.fromOffset(10, 10),
