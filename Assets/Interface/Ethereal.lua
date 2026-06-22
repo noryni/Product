@@ -1906,7 +1906,13 @@ function Library:Create_Tab(Name, Icon)
     function Tab.Create_Toggle(Options)
         local Flag = Options.flag or Options.name
         local Saved_Value = self.Saved_Config and self.Saved_Config[Flag]
-		local Default = Saved_Value ~= nil and (Saved_Value == true) or (Options.enabled == true)
+		local Default
+
+		if self.Saved_Config and self.Saved_Config[Flag] ~= nil then
+    		Default = self.Saved_Config[Flag] == true
+		else
+    		Default = Options.enabled == true
+		end
 
         local Has_Description = Options.info and Options.info ~= ''
 
