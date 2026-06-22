@@ -37,6 +37,7 @@ local Library = {
     Control_Objects = {},
     Tabs = {},
     Tab_Buttons = {},
+    Tab_Icons = {},
     Search_Items = {},
 	Saved_Config = {},
     Active_Tab = 1,
@@ -275,7 +276,7 @@ local function Load_Config()
     return nil
 end
 
-print('Interface by - ©noryni (Github)') --// [Attribution required if removed]
+print('Interface by - ©noryni (Github)') --// [Attribution required if removed 💖]
 
 function Library.New()
     local self = setmetatable({}, Library)
@@ -405,6 +406,37 @@ function Library.New()
                 Create_Tween(Main_Panel, 0.35, {Position = UDim2.new(0, Abs_X, 0, Abs_Y)}, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
             end
             Was_Free = Freedom
+            task.wait(0.1)
+        end
+    end)
+
+	task.spawn(function()
+        local Was_Dynamic = (getgenv and getgenv().Dynamic_Tabs_Enabled) ~= false
+        local Toggle_Reaction_Speed = 0.12
+        while Main_Panel and Main_Panel.Parent do
+            local Dynamic_Tabs_Enabled = (getgenv and getgenv().Dynamic_Tabs_Enabled) ~= false
+            if Dynamic_Tabs_Enabled ~= Was_Dynamic then
+                for Tab_Index, _ in ipairs(self.Tab_Buttons) do
+                    local Icon_Object = self.Tab_Icons[Tab_Index]
+                    local Is_Active = (Tab_Index == self.Active_Tab)
+                    if Icon_Object and not Is_Active then
+                        Icon_Object.Rotation = 0
+                        Icon_Object.Position = UDim2.fromOffset(0, 0)
+                        if Dynamic_Tabs_Enabled then
+                            Create_Tween(Icon_Object, Toggle_Reaction_Speed, {
+                                Size = UDim2.fromOffset(0, 16),
+                                ImageTransparency = 1,
+                            }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+                        else
+                            Create_Tween(Icon_Object, Toggle_Reaction_Speed, {
+                                Size = UDim2.fromOffset(16, 16),
+                                ImageTransparency = 0,
+                            }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+                        end
+                    end
+                end
+            end
+            Was_Dynamic = Dynamic_Tabs_Enabled
             task.wait(0.1)
         end
     end)
@@ -1008,12 +1040,79 @@ function Library:Switch_Tab(Index)
             BackgroundTransparency = Is_Active and 0 or 1,
             TextColor3 = Is_Active and Theme.Accent or Theme.Dim,
         })
+
         local Underline = Button:FindFirstChild('Underline')
+
         if Underline then
             Create_Tween(Underline, 0.22, {
                 BackgroundTransparency = Is_Active and 0 or 1,
                 Size = Is_Active and UDim2.new(1, -8, 0, 2) or UDim2.new(0, 0, 0, 2),
             }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+        end
+
+        local Icon_Object = self.Tab_Icons[Tab_Index]
+        local Dynamic_Tabs_Enabled = (getgenv and getgenv().Dynamic_Tabs_Enabled) ~= false
+        local Dynamic_Tabs_Animation_Speed = (getgenv and getgenv().Dynamic_Tabs_Animation_Speed_Enabled) or 0.45
+        local Dynamic_Tabs_Animation_Style = (getgenv and getgenv().Dynamic_Tabs_Animations_Type_Enabled) or 'Fade'
+
+        if Icon_Object then
+            if Dynamic_Tabs_Enabled and Is_Active then
+                Icon_Object.Rotation = 0
+                if Dynamic_Tabs_Animation_Style == 'Pop' then
+                    Icon_Object.Size = UDim2.fromOffset(0, 0)
+                    Icon_Object.ImageTransparency = 1
+                    Icon_Object.Position = UDim2.fromOffset(0, 0)
+                    Create_Tween(Icon_Object, Dynamic_Tabs_Animation_Speed * 0.7, {
+                        ImageTransparency = 0,
+                        Size = UDim2.fromOffset(18, 18),
+                    }, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
+                    task.delay(Dynamic_Tabs_Animation_Speed * 0.7, function()
+                        if Icon_Object and Icon_Object.Parent then
+                            Create_Tween(Icon_Object, Dynamic_Tabs_Animation_Speed * 0.4, {
+                                Size = UDim2.fromOffset(16, 16),
+                            }, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
+                        end
+                    end)
+                elseif Dynamic_Tabs_Animation_Style == 'Fade' then
+                    Icon_Object.Size = UDim2.fromOffset(16, 16)
+                    Icon_Object.ImageTransparency = 1
+                    Icon_Object.Position = UDim2.fromOffset(-10, 0)
+                    Create_Tween(Icon_Object, Dynamic_Tabs_Animation_Speed, {
+                        Position = UDim2.fromOffset(0, 0),
+                        ImageTransparency = 0,
+                    }, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+                elseif Dynamic_Tabs_Animation_Style == 'Grow' then
+                    Icon_Object.Size = UDim2.fromOffset(0, 0)
+                    Icon_Object.ImageTransparency = 1
+                    Icon_Object.Position = UDim2.fromOffset(0, 0)
+                    Create_Tween(Icon_Object, Dynamic_Tabs_Animation_Speed, {
+                        Size = UDim2.fromOffset(16, 16),
+                        ImageTransparency = 0,
+                    }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+                elseif Dynamic_Tabs_Animation_Style == 'Zoom' then
+                    Icon_Object.Size = UDim2.fromOffset(26, 26)
+                    Icon_Object.ImageTransparency = 1
+                    Icon_Object.Position = UDim2.fromOffset(0, 0)
+                    Create_Tween(Icon_Object, Dynamic_Tabs_Animation_Speed, {
+                        Size = UDim2.fromOffset(16, 16),
+                        ImageTransparency = 0,
+                    }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+                end
+            elseif Dynamic_Tabs_Enabled and not Is_Active then
+                Icon_Object.Rotation = 0
+                Create_Tween(Icon_Object, 0.16, {
+                    Size = UDim2.fromOffset(0, 16),
+                    ImageTransparency = 1,
+                    Position = UDim2.fromOffset(0, 0),
+                }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+            else
+                Icon_Object.Rotation = 0
+                Create_Tween(Icon_Object, 0.16, {
+                    Size = UDim2.fromOffset(16, 16),
+                    ImageTransparency = 0,
+                    Position = UDim2.fromOffset(0, 0),
+                }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+            end
         end
     end
     self.Active_Tab = Index
@@ -1184,6 +1283,7 @@ function Library:Create_Tab(Name, Icon)
     end)
 
     table.insert(self.Tab_Buttons, Tab_Button)
+    self.Tab_Icons[Tab_Index] = (Icon and Icon ~= '') and Tab_Button.Content.Icon or nil
     local Captured_Index = Tab_Index
     Tab_Button.MouseButton1Click:Connect(function()
         if self.Search_Input and self.Search_Input.Text ~= '' then self.Search_Input.Text = '' end
