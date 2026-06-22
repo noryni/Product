@@ -2385,29 +2385,31 @@ function Library:Create_Tab(Name, Icon)
     function Tab.Create_Color_Picker(Options)
         local Flag = Options.flag or Options.name
         local Saved_Value = self.Saved_Config and self.Saved_Config[Flag]
-		local Default = Options.default or Theme.Accent
+        local Default = Options.default or Theme.Accent
 
-		if Saved_Value ~= nil then
-    		local Saved_Color = typeof(Saved_Value) == 'Color3' and Saved_Value or Hex_To_Color(Saved_Value)
-    		if Saved_Color then
-        		Default = Saved_Color
-    		end
-		end
+        if Saved_Value ~= nil then
+            local Saved_Color = typeof(Saved_Value) == 'Color3' and Saved_Value or Hex_To_Color(Saved_Value)
+            if Saved_Color then
+                Default = Saved_Color
+            end
+        end
 
         local Row = Row_Frame(46, Options.section)
         Row.Name = Flag
         Row_Header(Row, Options.name or Flag, Options.badge, 14)
 
         local Hue, Saturation, Value = Color3.toHSV(Default)
+        local SV_Target_X, SV_Target_Y = Saturation, 1 - Value
+        local Hue_Target = Hue
 
         local Swatch = Create_Instance('TextButton', {
-            AnchorPoint = Vector2.new(1, 0), 
-            Position = UDim2.new(1, -14, 0, 12),  
-            Size = UDim2.fromOffset(40, 22), 
+            AnchorPoint = Vector2.new(1, 0),
+            Position = UDim2.new(1, -14, 0, 12),
+            Size = UDim2.fromOffset(40, 22),
             BackgroundColor3 = Default,
-            BorderSizePixel = 0, 
-            Text = '', 
-            ZIndex = 17, 
+            BorderSizePixel = 0,
+            Text = '',
+            ZIndex = 17,
             AutoButtonColor = false,
         }, Row)
 
@@ -2415,23 +2417,23 @@ function Library:Create_Tab(Name, Icon)
         Create_Stroke(Swatch, Theme.Border, 1, 0.3)
 
         local Icon = Create_Instance('TextLabel', {
-            AnchorPoint = Vector2.new(1, 0), 
+            AnchorPoint = Vector2.new(1, 0),
             Position = UDim2.new(1, -60, 0, 12),
-            Size = UDim2.fromOffset(14, 18), 
+            Size = UDim2.fromOffset(14, 18),
             BackgroundTransparency = 1,
-            Font = Enum.Font.Code, 
-            TextSize = 12, 
-            Text = '▾', 
-            TextColor3 = Theme.Muted, 
+            Font = Enum.Font.Code,
+            TextSize = 12,
+            Text = '▾',
+            TextColor3 = Theme.Muted,
             ZIndex = 17,
         }, Row)
 
         local Picker = Create_Instance('Frame', {
-            Position = UDim2.new(0, 14, 0, 46), 
+            Position = UDim2.new(0, 14, 0, 46),
             Size = UDim2.new(1, -28, 0, 0),
-            BackgroundColor3 = Theme.Panel, 
-            BorderSizePixel = 0, 
-            ClipsDescendants = true, 
+            BackgroundColor3 = Theme.Panel,
+            BorderSizePixel = 0,
+            ClipsDescendants = true,
             ZIndex = 19,
         }, Row)
 
@@ -2439,34 +2441,51 @@ function Library:Create_Tab(Name, Icon)
         Create_Stroke(Picker, Theme.Border, 1, 0.3)
 
         local Pad = Create_Instance('Frame', {
-            Position = UDim2.fromOffset(10, 10), 
+            Position = UDim2.fromOffset(10, 10),
             Size = UDim2.new(1, -20, 0, 90),
-            BackgroundTransparency = 1, 
+            BackgroundTransparency = 1,
             ZIndex = 20,
         }, Picker)
 
         local SV_Box = Create_Instance('Frame', {
-            Size = UDim2.new(1, -26, 1, 0), 
+            Size = UDim2.new(1, -26, 1, 0),
             BackgroundColor3 = Color3.fromHSV(Hue, 1, 1),
-            BorderSizePixel = 0, 
+            BorderSizePixel = 0,
             ZIndex = 20,
         }, Pad)
 
         Create_Corner(SV_Box, 4)
-        
-        local White_Gradient = Create_Instance('Frame', {Size = UDim2.fromScale(1, 1), BackgroundColor3 = Color3.new(1, 1, 1), BorderSizePixel = 0, ZIndex = 20}, SV_Box)
+
+        local White_Gradient = Create_Instance('Frame', {
+            Size = UDim2.fromScale(1, 1),
+            BackgroundColor3 = Color3.new(1, 1, 1),
+            BorderSizePixel = 0,
+            ZIndex = 20
+        }, SV_Box)
+
         Create_Corner(White_Gradient, 4)
-        Create_Instance('UIGradient', {Transparency = NumberSequence.new(0, 1)}, White_Gradient)
-        
-        local Black_Gradient = Create_Instance('Frame', {Size = UDim2.fromScale(1, 1), BackgroundColor3 = Color3.new(0, 0, 0), BorderSizePixel = 0, ZIndex = 21}, SV_Box)
+        Create_Instance('UIGradient', {
+            Transparency = NumberSequence.new(0, 1)
+        }, White_Gradient)
+
+        local Black_Gradient = Create_Instance('Frame', {
+            Size = UDim2.fromScale(1, 1),
+            BackgroundColor3 = Color3.new(0, 0, 0),
+            BorderSizePixel = 0,
+            ZIndex = 21
+        }, SV_Box)
+
         Create_Corner(Black_Gradient, 4)
-        Create_Instance('UIGradient', {Rotation = 90, Transparency = NumberSequence.new(1, 0)}, Black_Gradient)
+        Create_Instance('UIGradient', {
+            Rotation = 90,
+            Transparency = NumberSequence.new(1, 0)
+        }, Black_Gradient)
 
         local SV_Cursor = Create_Instance('Frame', {
-            AnchorPoint = Vector2.new(0.5, 0.5), 
+            AnchorPoint = Vector2.new(0.5, 0.5),
             Size = UDim2.fromOffset(8, 8),
-            BackgroundColor3 = Theme.White, 
-            BorderSizePixel = 0, 
+            BackgroundColor3 = Theme.White,
+            BorderSizePixel = 0,
             ZIndex = 22,
             Position = UDim2.fromScale(Saturation, 1 - Value),
         }, SV_Box)
@@ -2475,44 +2494,50 @@ function Library:Create_Tab(Name, Icon)
         Create_Stroke(SV_Cursor, Color3.new(0, 0, 0), 1, 0.2)
 
         local Hue_Bar = Create_Instance('Frame', {
-            AnchorPoint = Vector2.new(1, 0), 
+            AnchorPoint = Vector2.new(1, 0),
             Position = UDim2.new(1, 0, 0, 0),
-            Size = UDim2.fromOffset(18, 90), 
-            BorderSizePixel = 0, 
+            Size = UDim2.fromOffset(18, 90),
+            BorderSizePixel = 0,
             ZIndex = 20,
         }, Pad)
 
         Create_Corner(Hue_Bar, 4)
-        
-        Create_Instance('UIGradient', {Rotation = 90, Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 0, 0)),
-            ColorSequenceKeypoint.new(0.17, Color3.fromRGB(255, 255, 0)),
-            ColorSequenceKeypoint.new(0.33, Color3.fromRGB(0, 255, 0)),
-            ColorSequenceKeypoint.new(0.50, Color3.fromRGB(0, 255, 255)),
-            ColorSequenceKeypoint.new(0.67, Color3.fromRGB(0, 0, 255)),
-            ColorSequenceKeypoint.new(0.83, Color3.fromRGB(255, 0, 255)),
-            ColorSequenceKeypoint.new(1.00, Color3.fromRGB(255, 0, 0)),
-        })}, Hue_Bar)
+
+        Create_Instance('UIGradient', {
+            Rotation = 90,
+            Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 0, 0)),
+                ColorSequenceKeypoint.new(0.17, Color3.fromRGB(255, 255, 0)),
+                ColorSequenceKeypoint.new(0.33, Color3.fromRGB(0, 255, 0)),
+                ColorSequenceKeypoint.new(0.50, Color3.fromRGB(0, 255, 255)),
+                ColorSequenceKeypoint.new(0.67, Color3.fromRGB(0, 0, 255)),
+                ColorSequenceKeypoint.new(0.83, Color3.fromRGB(255, 0, 255)),
+                ColorSequenceKeypoint.new(1.00, Color3.fromRGB(255, 0, 0)),
+            })
+        }, Hue_Bar)
 
         local Hue_Cursor = Create_Instance('Frame', {
-            AnchorPoint = Vector2.new(0.5, 0.5), 
+            AnchorPoint = Vector2.new(0.5, 0.5),
             Position = UDim2.new(0.5, 0, Hue, 0),
-            Size = UDim2.new(1, 4, 0, 3), 
-            BackgroundColor3 = Theme.White, 
-            BorderSizePixel = 0, 
+            Size = UDim2.new(1, 4, 0, 3),
+            BackgroundColor3 = Theme.White,
+            BorderSizePixel = 0,
             ZIndex = 22,
         }, Hue_Bar)
 
         Create_Corner(Hue_Cursor, 2)
 
         local Is_Open = false
+        local SV_Dragging, Hue_Dragging = false, false
 
         local function Recolor(Silent)
             local Color = Color3.fromHSV(Hue, Saturation, Value)
             Swatch.BackgroundColor3 = Color
             SV_Box.BackgroundColor3 = Color3.fromHSV(Hue, 1, 1)
             self.Flags[Flag] = Color
-            if not Silent and Options.callback then pcall(Options.callback, Color) end
+            if not Silent and Options.callback then
+                pcall(Options.callback, Color)
+            end
         end
 
         local function Set_Open(State_Open)
@@ -2523,51 +2548,86 @@ function Library:Create_Tab(Name, Icon)
             Create_Tween(Row, 0.24, {Size = UDim2.new(1, 0, 0, Is_Open and (46 + 110 + 8) or 46)})
         end
 
-        Swatch.MouseButton1Click:Connect(function() Set_Open(not Is_Open) end)
-
-        local SV_Dragging, Hue_Dragging = false, false
+        Swatch.MouseButton1Click:Connect(function()
+            Set_Open(not Is_Open)
+        end)
 
         local function Update_SV(Pixel_X, Pixel_Y)
             local Alpha_X = math.clamp((Pixel_X - SV_Box.AbsolutePosition.X) / math.max(SV_Box.AbsoluteSize.X, 1), 0, 1)
             local Alpha_Y = math.clamp((Pixel_Y - SV_Box.AbsolutePosition.Y) / math.max(SV_Box.AbsoluteSize.Y, 1), 0, 1)
             Saturation, Value = Alpha_X, 1 - Alpha_Y
-            SV_Cursor.Position = UDim2.fromScale(Alpha_X, Alpha_Y)
+            SV_Target_X, SV_Target_Y = Alpha_X, Alpha_Y
             Recolor(false)
         end
 
         local function Update_Hue(Pixel_Y)
             local Alpha_Y = math.clamp((Pixel_Y - Hue_Bar.AbsolutePosition.Y) / math.max(Hue_Bar.AbsoluteSize.Y, 1), 0, 1)
             Hue = Alpha_Y
-            Hue_Cursor.Position = UDim2.new(0.5, 0, Alpha_Y, 0)
+            Hue_Target = Alpha_Y
             Recolor(false)
         end
 
-        local SV_Hit = Create_Instance('TextButton', {Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, Text = '', ZIndex = 23, AutoButtonColor = false}, SV_Box)
-        local Hue_Hit = Create_Instance('TextButton', {Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, Text = '', ZIndex = 23, AutoButtonColor = false}, Hue_Bar)
+        local SV_Hit = Create_Instance('TextButton', {
+            Size = UDim2.fromScale(1, 1),
+            BackgroundTransparency = 1,
+            Text = '',
+            ZIndex = 23,
+            AutoButtonColor = false
+        }, SV_Box)
+
+        local Hue_Hit = Create_Instance('TextButton', {
+            Size = UDim2.fromScale(1, 1),
+            BackgroundTransparency = 1,
+            Text = '',
+            ZIndex = 23,
+            AutoButtonColor = false
+        }, Hue_Bar)
 
         SV_Hit.InputBegan:Connect(function(Input)
             if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-                SV_Dragging = true; Update_SV(Input.Position.X, Input.Position.Y)
+                SV_Dragging = true
+                Update_SV(Input.Position.X, Input.Position.Y)
             end
         end)
 
         Hue_Hit.InputBegan:Connect(function(Input)
             if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-                Hue_Dragging = true; Update_Hue(Input.Position.Y)
+                Hue_Dragging = true
+                Update_Hue(Input.Position.Y)
             end
         end)
 
         Connection['Color_Drag_' .. Flag] = UserInputService.InputChanged:Connect(function(Input)
             if Input.UserInputType ~= Enum.UserInputType.MouseMovement and Input.UserInputType ~= Enum.UserInputType.Touch then return end
-            if SV_Dragging then Update_SV(Input.Position.X, Input.Position.Y) end
-            if Hue_Dragging then Update_Hue(Input.Position.Y) end
+
+            if SV_Dragging then
+                Update_SV(Input.Position.X, Input.Position.Y)
+            end
+
+            if Hue_Dragging then
+                Update_Hue(Input.Position.Y)
+            end
         end)
-        
+
         Connection['Color_End_' .. Flag] = UserInputService.InputEnded:Connect(function(Input)
             if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-                if SV_Dragging or Hue_Dragging then self:Autosave() end
+                if SV_Dragging or Hue_Dragging then
+                    self:Autosave()
+                end
                 SV_Dragging, Hue_Dragging = false, false
             end
+        end)
+
+        Connection['Color_Smooth_' .. Flag] = RunService.RenderStepped:Connect(function(dt)
+            local Alpha = 1 - math.exp(-18 * dt)
+            local X = SV_Cursor.Position.X.Scale
+            local Y = SV_Cursor.Position.Y.Scale
+            local Alpha_X = X + (SV_Target_X - X) * Alpha
+            local Alpha_Y = Y + (SV_Target_Y - Y) * Alpha
+            SV_Cursor.Position = UDim2.fromScale(Alpha_X, Alpha_Y)
+            local Noryn = Hue_Cursor.Position.Y.Scale
+            local On_Top = Noryn + (Hue_Target - Noryn) * Alpha
+            Hue_Cursor.Position = UDim2.new(0.5, 0, On_Top, 0)
         end)
 
         self.Flags[Flag] = Default
@@ -2575,20 +2635,28 @@ function Library:Create_Tab(Name, Icon)
             Kind = 'color',
             Apply = function(Value_Argument, Silent)
                 local Color = Value_Argument
-                if type(Value_Argument) == 'string' then Color = Hex_To_Color(Value_Argument) end
+                if type(Value_Argument) == 'string' then
+                    Color = Hex_To_Color(Value_Argument)
+                end
                 if typeof(Color) == 'Color3' then
                     Hue, Saturation, Value = Color3.toHSV(Color)
+
+                    SV_Target_X, SV_Target_Y = Saturation, 1 - Value
+                    Hue_Target = Hue
+
                     SV_Cursor.Position = UDim2.fromScale(Saturation, 1 - Value)
                     Hue_Cursor.Position = UDim2.new(0.5, 0, Hue, 0)
+
                     Recolor(Silent)
                 end
             end,
         }
-		self.Control_Objects[Flag].Apply(Default, true)
 
-		if Options.callback then
-    		pcall(Options.callback, Default)
-		end
+        self.Control_Objects[Flag].Apply(Default, true)
+
+        if Options.callback then
+            pcall(Options.callback, Default)
+        end
 
         Register_Search(Row, Options.name or Flag)
     end
