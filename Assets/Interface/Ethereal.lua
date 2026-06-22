@@ -755,6 +755,22 @@ function Library.New()
     Create_Corner(Status_Dot, 3)
     self.Status_Dot = Status_Dot
 
+	task.spawn(function()
+        if not self.Status_Dot then return end
+        while self.Status_Dot and self.Status_Dot.Parent do
+            local In = TweenService:Create(self.Status_Dot, TweenInfo.new(0.6, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+                BackgroundTransparency = 0.35
+            })
+            local Out = TweenService:Create(self.Status_Dot, TweenInfo.new(0.6, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+                BackgroundTransparency = 0
+            })
+            In:Play()
+            In.Completed:Wait()
+            Out:Play()
+            Out.Completed:Wait()
+        end
+    end)
+
     local Status_Label = Create_Instance('TextLabel', {
         AnchorPoint = Vector2.new(0, 0.5), 
         Position = UDim2.new(0, 28, 0.5, 0),
@@ -1092,8 +1108,6 @@ function Library:Create_Tab(Name, Icon)
         AutoButtonColor = false,
     }, self.Tab_Bar)
 
-    Create_Corner(Tab_Button, 6)
-
 	Create_Corner(Tab_Button, 6)
     Create_Instance('UIPadding', {
         PaddingLeft = UDim.new(0, 12),
@@ -1101,19 +1115,51 @@ function Library:Create_Tab(Name, Icon)
     }, Tab_Button)
 
     if Icon and Icon ~= '' then
-        Tab_Button.Text = '  ' .. Name
-        local Image = Create_Instance('ImageLabel', {
-            Name = 'Icon',
-            AnchorPoint = Vector2.new(0, 0.5), 
-            Position = UDim2.fromOffset(5, 14),
-            Size = UDim2.fromOffset(16, 16), 
-            BackgroundTransparency = 1, 
-            Image = Icon,
-            ImageColor3 = Is_First and Theme.Accent or Theme.Dim, 
+        Tab_Button.Text = '' 
+        local Content = Create_Instance('Frame', {
+            Name = 'Content',
+            AnchorPoint = Vector2.new(0, 0.5),
+            Position = UDim2.new(0, 0, 0.5, 0),
+            Size = UDim2.fromOffset(0, 16),
+            AutomaticSize = Enum.AutomaticSize.X,
+            BackgroundTransparency = 1,
             ZIndex = 13,
         }, Tab_Button)
+
+        Create_Instance('UIListLayout', {
+            FillDirection = Enum.FillDirection.Horizontal,
+            Padding = UDim.new(0, 4),
+            VerticalAlignment = Enum.VerticalAlignment.Center,
+            HorizontalAlignment = Enum.HorizontalAlignment.Center,
+            SortOrder = Enum.SortOrder.LayoutOrder,
+        }, Content)
+
+        local Image = Create_Instance('ImageLabel', {
+            Name = 'Icon',
+            Size = UDim2.fromOffset(16, 16),
+            BackgroundTransparency = 1,
+            Image = 'rbxassetid://' .. Icon,
+            ImageColor3 = Is_First and Theme.Accent or Theme.Dim,
+            LayoutOrder = 1,
+            ZIndex = 13,
+        }, Content)
+
+        local Label = Create_Instance('TextLabel', {
+            Name = 'Label',
+            Size = UDim2.fromOffset(0, 16),
+            AutomaticSize = Enum.AutomaticSize.X,
+            BackgroundTransparency = 1,
+            Font = Enum.Font.Code,
+            TextSize = 13,
+            Text = Name,
+            TextColor3 = Is_First and Theme.Accent or Theme.Dim,
+            LayoutOrder = 2,
+            ZIndex = 13,
+        }, Content)
+
         Tab_Button:GetPropertyChangedSignal('TextColor3'):Connect(function()
             Image.ImageColor3 = Tab_Button.TextColor3
+            Label.TextColor3 = Tab_Button.TextColor3
         end)
     end
 
@@ -1886,7 +1932,7 @@ function Library:Create_Tab(Name, Icon)
         Create_Corner(Action_Button, 6)
         Create_Stroke(Action_Button, Theme.Accent, 1, 0.5)
 
-        Row_Hover(Row)
+        --// [Row_Hover(Row)]
 
         Action_Button.MouseEnter:Connect(function() 
             Create_Tween(Action_Button, 0.12, {BackgroundColor3 = Color3.fromRGB(50, 24, 30)}) 
