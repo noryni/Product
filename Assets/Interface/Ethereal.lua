@@ -2475,7 +2475,7 @@ function Library:Create_Tab(Name, Icon)
             ZIndex = 21
         }, SV_Box)
 
-        Create_Corner(Black_Gradient, 4)
+        Create_Corner(Black_Gradient, 0)
         Create_Instance('UIGradient', {
             Rotation = 90,
             Transparency = NumberSequence.new(1, 0)
