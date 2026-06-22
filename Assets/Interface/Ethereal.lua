@@ -27,7 +27,9 @@ local UserInputService = cloneref(game:GetService('UserInputService'))
 local TweenService = cloneref(game:GetService('TweenService'))
 local RunService = cloneref(game:GetService('RunService'))
 local CoreGui = cloneref(game:GetService('CoreGui'))
+local Players = cloneref(game:GetService('Players'))
 
+local Local_Player = Players.LocalPlayer
 local Place_Id = game.PlaceId
 
 local Library = {
@@ -113,7 +115,7 @@ end
 
 function Library:clear()
     Clear_All_Connections()
-    for _, object in CoreGui:GetChildren() do
+    for _, object in ipairs(CoreGui:GetChildren()) do
         if object.Name ~= 'Noryn' then
             continue
         end
@@ -278,7 +280,7 @@ print('Interface by - ©noryni (Github)') --// [Attribution required if removed]
 function Library.New()
     local self = setmetatable({}, Library)
 
-    Library:clear()
+    self:clear()
 	self.Saved_Config = {}
 
 	local Config_Was_Loaded = false
@@ -359,7 +361,7 @@ function Library.New()
             end
         end)
 
-        UserInputService.InputChanged:Connect(function(Input)
+        Connection.Title_Drag_Input = UserInputService.InputChanged:Connect(function(Input)
             if not Dragging then return end
             if Input.UserInputType ~= Enum.UserInputType.MouseMovement and Input.UserInputType ~= Enum.UserInputType.Touch then 
                 return 
@@ -379,7 +381,7 @@ function Library.New()
         end)
     end
 
-	    task.spawn(function()
+	task.spawn(function()
         local Was_Free = (getgenv and getgenv().Freedom_Enabled) == true
         local Was_Drag_Enabled = (getgenv and getgenv().Interface_Drag_Enabled) ~= false
         while Main_Panel and Main_Panel.Parent do
@@ -443,10 +445,9 @@ function Library.New()
         local Row_Count = 3
         local Column_Count = 3
         local Last_Time = tick()
-        local Animation_Connection
-        Animation_Connection = RunService.Heartbeat:Connect(function()
+        Connection.Icon_Animation = RunService.Heartbeat:Connect(function()
             if not Animated or not Animated.Parent then 
-                Animation_Connection:Disconnect() 
+                Connection.Icon_Animation = nil
                 return 
             end
             local Real_Time = tick()
@@ -721,7 +722,7 @@ function Library.New()
         	end
     	end)
 
-    	UserInputService.InputChanged:Connect(function(Input)
+    	Connection.Footer_Drag_Input = UserInputService.InputChanged:Connect(function(Input)
         	if not Footer_Dragging then return end
         	if Input.UserInputType ~= Enum.UserInputType.MouseMovement and Input.UserInputType ~= Enum.UserInputType.Touch then return end
 
@@ -816,7 +817,7 @@ function Library.New()
             end
         end)
 
-        UserInputService.InputChanged:Connect(function(Input)
+        Connection.Float_Drag_Input = UserInputService.InputChanged:Connect(function(Input)
             if not Dragging then return end
             if Input.UserInputType ~= Enum.UserInputType.MouseMovement and Input.UserInputType ~= Enum.UserInputType.Touch then 
                 return 
@@ -837,7 +838,7 @@ function Library.New()
         end)
     end
 
-    UserInputService.InputBegan:Connect(function(Input, Processed)
+    Connection.Global_Input = UserInputService.InputBegan:Connect(function(Input, Processed)
         if self.Capturing and Input.UserInputType == Enum.UserInputType.Keyboard then
             self.Capturing(Input.KeyCode)
             return
@@ -927,6 +928,7 @@ function Library:Autosave()
         while self.Save_Dirty do
             self.Save_Dirty = false
             task.wait(0.4)
+            if self.Save_Dirty then continue end
             if getgenv and getgenv().Config_Enabled == false then break end
             local Success = Save_Config(self.Flags)
             if Success then
@@ -1502,6 +1504,343 @@ function Library:Create_Tab(Name, Icon)
         return Row
     end
 
+    function Tab.Create_Playerlist(Options)
+        local Flag = Options.flag or Options.name
+
+        local Saved_Value = self.Saved_Config and self.Saved_Config[Flag]
+        local Saved_User_Id = tonumber(Saved_Value)
+
+        local Row_Height = 30
+        local Max_Visible = 5
+        local List_Height = Max_Visible * Row_Height
+
+        local Diddy = Row_Frame(List_Height + 38, Options.section)
+        Diddy.Name = Flag
+        Diddy.ClipsDescendants = true
+
+        local Head = Create_Instance('Frame', {
+            Position = UDim2.fromOffset(14, 9),
+            Size = UDim2.new(1, -28, 0, 18),
+            BackgroundTransparency = 1,
+            ZIndex = 16,
+        }, Diddy)
+
+        Create_Instance('TextLabel', {
+            AnchorPoint = Vector2.new(0, 0),
+            Size = UDim2.fromOffset(160, 18),
+            BackgroundTransparency = 1,
+            Font = Enum.Font.Code,
+            TextSize = 14,
+            Text = Options.name or 'Players',
+            TextColor3 = Theme.Text,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            ZIndex = 16,
+        }, Head)
+
+        local Count_Label = Create_Instance('TextLabel', {
+            AnchorPoint = Vector2.new(1, 0),
+            Position = UDim2.new(1, 0, 0, 0),
+            Size = UDim2.fromOffset(140, 18),
+            BackgroundTransparency = 1,
+            Font = Enum.Font.Code,
+            TextSize = 12,
+            Text = 'Online: 0',
+            TextColor3 = Theme.Dim,
+            TextXAlignment = Enum.TextXAlignment.Right,
+            ZIndex = 16,
+        }, Head)
+
+        local List = Create_Instance('ScrollingFrame', {
+            Name = 'List',
+            Position = UDim2.fromOffset(14, 34),
+            Size = UDim2.new(1, -28, 0, List_Height),
+            BackgroundColor3 = Theme.Panel,
+            BorderSizePixel = 0,
+            ClipsDescendants = true,
+            CanvasSize = UDim2.new(0, 0, 0, 0),
+            AutomaticCanvasSize = Enum.AutomaticSize.Y,
+            ScrollBarThickness = 4,
+            ScrollBarImageColor3 = Theme.Accent,
+            ScrollingDirection = Enum.ScrollingDirection.Y,
+            ZIndex = 16,
+        }, Diddy)
+
+        Create_Corner(List, 6)
+        Create_Stroke(List, Theme.Border, 1, 0.3)
+
+        Create_Instance('UIListLayout', {
+            Padding = UDim.new(0, 2),
+            SortOrder = Enum.SortOrder.LayoutOrder,
+        }, List)
+
+        Create_Instance('UIPadding', {
+            PaddingTop = UDim.new(0, 3),
+            PaddingBottom = UDim.new(0, 3),
+        }, List)
+
+        local Rows = {}
+        local Selected_User_Id = nil
+        local Initialized = false
+
+        local Last_Selected_User_Id = nil
+        local function Force_Callback(Player)
+            if Options.callback then
+                pcall(Options.callback, Player)
+            end
+        end
+
+        local function Set_Status_Selection(Player_Name, Is_Selected)
+            self:Status((Is_Selected and 'Selected: ' or 'Unselected: ') .. Player_Name, Is_Selected and Theme.Accent or Theme.Dim, 1.4)
+        end
+
+        local function Update_Count()
+            Count_Label.Text = 'Online: ' .. tostring(#Players:GetPlayers())
+        end
+
+        local function Render_Row_State(Row_Data, Is_Selected, Animate)
+            if Animate then
+                Create_Tween(Row_Data.Dot, 0.14, {
+                    Size = Is_Selected and UDim2.fromOffset(6, 6) or UDim2.fromOffset(0, 0)
+                }, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+
+                Create_Tween(Row_Data.Name_Label, 0.14, {
+                    Position = Is_Selected and UDim2.fromOffset(24, 0) or UDim2.fromOffset(8, 0),
+                    TextColor3 = Is_Selected and Theme.Accent or Theme.Dim,
+                }, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+            else
+                Row_Data.Dot.Size = Is_Selected and UDim2.fromOffset(6, 6) or UDim2.fromOffset(0, 0)
+                Row_Data.Name_Label.Position = Is_Selected and UDim2.fromOffset(24, 0) or UDim2.fromOffset(8, 0)
+                Row_Data.Name_Label.TextColor3 = Is_Selected and Theme.Accent or Theme.Dim
+            end
+        end
+
+        local function Apply_Selection(Player, Silent, Animate)
+            local New_User_Id = Player and Player.UserId or nil
+
+            if Selected_User_Id and Rows[Selected_User_Id] then
+                Render_Row_State(Rows[Selected_User_Id], false, Animate)
+            end
+
+            Last_Selected_User_Id = New_User_Id
+
+            Selected_User_Id = New_User_Id
+            self.Flags[Flag] = New_User_Id
+
+            if New_User_Id and Rows[New_User_Id] then
+                Render_Row_State(Rows[New_User_Id], true, Animate)
+            end
+
+            if not Silent then
+                if Player then
+                    Set_Status_Selection(Player.DisplayName, true)
+                end
+                if Options.callback then
+                    pcall(Options.callback, Player)
+                end
+            end
+        end
+
+        local function Make_Row(Player)
+            local Row = Create_Instance('Frame', {
+                Name = tostring(Player.UserId),
+                Size = UDim2.new(1, 0, 0, Row_Height),
+                BackgroundTransparency = 1,
+                BorderSizePixel = 0,
+                LayoutOrder = 0,
+                ZIndex = 17,
+                ClipsDescendants = true,
+            }, List)
+
+            local Dot = Create_Instance('Frame', {
+                AnchorPoint = Vector2.new(0.5, 0.5),
+                Position = UDim2.new(0, 13, 0.5, 0),
+                Size = UDim2.fromOffset(0, 0),
+                BackgroundColor3 = Theme.Accent,
+                BorderSizePixel = 0,
+                ZIndex = 18,
+            }, Row)
+
+            Create_Corner(Dot, 3)
+
+            local Name_Label = Create_Instance('TextLabel', {
+                Position = UDim2.fromOffset(8, 0),
+                Size = UDim2.new(1, -18, 1, 0),
+                BackgroundTransparency = 1,
+                Font = Enum.Font.Code,
+                TextSize = 12,
+                Text = Player.DisplayName ~= Player.Name and (Player.DisplayName .. ' (' .. Player.Name .. ')') or Player.Name,
+                TextColor3 = Theme.Dim,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                TextTruncate = Enum.TextTruncate.AtEnd,
+                ZIndex = 18,
+            }, Row)
+
+            local Click = Create_Instance('TextButton', {
+                Size = UDim2.fromScale(1, 1),
+                BackgroundTransparency = 1,
+                Text = '',
+                ZIndex = 19,
+                AutoButtonColor = false,
+            }, Row)
+
+            local Row_Data = {
+                Row = Row,
+                Dot = Dot,
+                Name_Label = Name_Label,
+                Player = Player,
+            }
+
+            Click.MouseButton1Click:Connect(function()
+                if Selected_User_Id == Player.UserId then
+                    local Left_Player = Player
+                    Apply_Selection(nil, false, true)
+                    Set_Status_Selection(Left_Player.DisplayName, false)
+                    self:Autosave()
+                else
+                    Apply_Selection(Player, false, true)
+                    self:Autosave()
+                end
+            end)
+
+            Render_Row_State(Row_Data, Selected_User_Id == Player.UserId, false)
+            return Row_Data
+        end
+
+        local function Sort_Rows()
+            local Order_List = {}
+            for _, Row_Data in pairs(Rows) do
+                table.insert(Order_List, Row_Data)
+            end
+
+            table.sort(Order_List, function(A, B)
+                return A.Player.Name:lower() < B.Player.Name:lower()
+            end)
+
+            for Index, Row_Data in ipairs(Order_List) do
+                Row_Data.Row.LayoutOrder = Index
+            end
+        end
+
+        local function Add_Player(Player, Animate)
+            if Player == Local_Player then return end
+            if Rows[Player.UserId] then return end
+
+            local Row_Data = Make_Row(Player)
+            Rows[Player.UserId] = Row_Data
+
+            Sort_Rows()
+            Update_Count()
+
+            if Animate then
+                Row_Data.Row.Size = UDim2.new(1, 0, 0, 0)
+                Create_Tween(Row_Data.Row, 0.2, {
+                    Size = UDim2.new(1, 0, 0, Row_Height)
+                })
+            end
+
+            if Saved_User_Id and Saved_User_Id == Player.UserId and Selected_User_Id == nil then
+                Apply_Selection(Player, true, false)
+            end
+
+            if Selected_User_Id == Player.UserId then
+                Render_Row_State(Row_Data, true, false)
+            end
+
+            if Last_Selected_User_Id and Player.UserId == Last_Selected_User_Id then
+                task.defer(function()
+                    Apply_Selection(Player, true, true)
+                    Force_Callback(Player)
+                end)
+            end
+        end
+
+        local function Remove_Player(Player, Animate)
+            local Row_Data = Rows[Player.UserId]
+            if not Row_Data then return end
+
+            Rows[Player.UserId] = nil
+            Update_Count()
+
+            if Selected_User_Id == Player.UserId then
+                self.Flags[Flag] = Saved_User_Id
+                Selected_User_Id = nil
+
+                if Options.callback then
+                    pcall(Options.callback, nil)
+                end
+            end
+
+            if Animate then
+                Create_Tween(Row_Data.Row, 0.18, {
+                    Size = UDim2.new(1, 0, 0, 0),
+                    BackgroundTransparency = 1
+                })
+
+                Create_Tween(Row_Data.Name_Label, 0.15, {
+                    TextTransparency = 1
+                })
+
+                Create_Tween(Row_Data.Dot, 0.15, {
+                    BackgroundTransparency = 1
+                })
+
+                task.delay(0.2, function()
+                    if Row_Data.Row then
+                        Row_Data.Row:Destroy()
+                    end
+                end)
+            else
+                Row_Data.Row:Destroy()
+            end
+        end
+
+        for _, Player in ipairs(Players:GetPlayers()) do
+            Add_Player(Player, false)
+        end
+
+        Update_Count()
+
+        Connection['Added' .. Flag] = Players.PlayerAdded:Connect(function(Player) Add_Player(Player, true) end)
+        Connection['Removed' .. Flag] = Players.PlayerRemoving:Connect(function(Player) Remove_Player(Player, true) end)
+
+        self.Flags[Flag] = Selected_User_Id
+
+        self.Control_Objects[Flag] = {
+            Kind = 'playerlist',
+            Apply = function(Value, Silent)
+                local Target_Id = tonumber(Value)
+                local Target_Player = nil
+
+                if Target_Id then
+                    for _, Row_Data in pairs(Rows) do
+                        if Row_Data.Player.UserId == Target_Id then
+                            Target_Player = Row_Data.Player
+                            break
+                        end
+                    end
+                end
+                Apply_Selection(Target_Player, Silent, true)
+            end,
+        }
+
+        Register_Search(Diddy, Options.name or Flag)
+
+        if Options.callback and not Initialized then
+            Initialized = true
+
+            local Initial_Player = nil
+            if Selected_User_Id then
+                for _, Row_Data in pairs(Rows) do
+                    if Row_Data.Player.UserId == Selected_User_Id then
+                        Initial_Player = Row_Data.Player
+                        break
+                    end
+                end
+            end
+            pcall(Options.callback, Initial_Player)
+        end
+    end
+
     function Tab.Create_Button(Options)
         local Has_Description = Options.info and Options.info ~= ''
         local Row = Row_Frame(Has_Description and 52 or 40, Options.section)
@@ -1770,24 +2109,28 @@ function Library:Create_Tab(Name, Icon)
                 Set_Value(Value_From_X(Input.Position.X), false, true)
             end
         end)
-        UserInputService.InputEnded:Connect(function(Input)
+
+        Connection['Slider_End_' .. Flag] = UserInputService.InputEnded:Connect(function(Input)
             if (Input.UserInputType == Enum.UserInputType.MouseButton1
             or Input.UserInputType == Enum.UserInputType.Touch) and Dragging then
                 Dragging = false
                 self:Autosave()
             end
         end)
-        UserInputService.InputChanged:Connect(function(Input)
+
+        Connection['Slider_Drag_' .. Flag] = UserInputService.InputChanged:Connect(function(Input)
             if not Dragging then return end
             if Input.UserInputType ~= Enum.UserInputType.MouseMovement
             and Input.UserInputType ~= Enum.UserInputType.Touch then return end
             Set_Value(Value_From_X(Input.Position.X), false, true)
         end)
+
         Set_Value(Default, true, true)
 
 		if Options.callback then
     		pcall(Options.callback, Default)
 		end
+
         Register_Search(Row, Options.name or Flag)
     end
 
@@ -2013,7 +2356,7 @@ function Library:Create_Tab(Name, Icon)
             end
         end)
 
-        UserInputService.InputBegan:Connect(function(Input, Game_Processed)
+        Connection['Keybind_Input_' .. Flag] = UserInputService.InputBegan:Connect(function(Input, Game_Processed)
             if Game_Processed or self.Capturing then return end
             if Current and Current ~= Enum.KeyCode.None and Input.KeyCode == Current then
                 if Options.callback then pcall(Options.callback, Current) end
@@ -2213,13 +2556,13 @@ function Library:Create_Tab(Name, Icon)
             end
         end)
 
-        UserInputService.InputChanged:Connect(function(Input)
+        Connection['Color_Drag_' .. Flag] = UserInputService.InputChanged:Connect(function(Input)
             if Input.UserInputType ~= Enum.UserInputType.MouseMovement and Input.UserInputType ~= Enum.UserInputType.Touch then return end
             if SV_Dragging then Update_SV(Input.Position.X, Input.Position.Y) end
             if Hue_Dragging then Update_Hue(Input.Position.Y) end
         end)
         
-        UserInputService.InputEnded:Connect(function(Input)
+        Connection['Color_End_' .. Flag] = UserInputService.InputEnded:Connect(function(Input)
             if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
                 if SV_Dragging or Hue_Dragging then self:Autosave() end
                 SV_Dragging, Hue_Dragging = false, false
