@@ -1307,7 +1307,7 @@ function Library:Create_Tab(Name, Icon)
             LayoutOrder = Next_Order(Options.section), 
             ZIndex = 15,
         }, Target_Column(Options.section))
-        Register_Search(Title_Object, Options.name)
+        Register_Search(Title_Object, '')
     end
 
     function Tab.Create_Label(Options)
@@ -1452,6 +1452,7 @@ function Library:Create_Tab(Name, Icon)
         Divider:SetAttribute('IsDivider', true)
         Divider:GetAttributeChangedSignal('Replay'):Connect(function() Play() end)
         task.spawn(function() task.wait(0.05) Play() end)
+		Register_Search(Divider, '')
         return Divider
     end
 
@@ -2095,7 +2096,7 @@ function Library:Create_Tab(Name, Icon)
         local Hit_Area = Create_Instance('TextButton', {
             AnchorPoint = Vector2.new(0.5, 0.5), 
             Position = UDim2.fromScale(0.5, 0.5),
-            Size = UDim2.new(1, 0, 0, 22), 
+            Size = UDim2.new(1, 0, 0, 25), 
             BackgroundTransparency = 1, 
             Text = '',
             ZIndex = 19, 
