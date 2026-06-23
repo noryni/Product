@@ -1052,8 +1052,8 @@ function Library:Switch_Tab(Index)
 
         local Icon_Object = self.Tab_Icons[Tab_Index]
         local Dynamic_Tabs_Enabled = (getgenv and getgenv().Dynamic_Tabs_Enabled) ~= false
-        local Dynamic_Tabs_Animation_Speed = (getgenv and getgenv().Dynamic_Tabs_Animation_Speed_Enabled) or 0.45
-        local Dynamic_Tabs_Animation_Style = (getgenv and getgenv().Dynamic_Tabs_Animations_Type_Enabled) or 'Fade'
+        local Dynamic_Tabs_Animation_Speed = (getgenv and getgenv().Dynamic_Tabs_Animation_Speed_Enabled) or 0.25
+        local Dynamic_Tabs_Animation_Style = (getgenv and getgenv().Dynamic_Tabs_Animations_Type_Enabled) or 'Grow'
 
         if Icon_Object then
             if Dynamic_Tabs_Enabled and Is_Active then
