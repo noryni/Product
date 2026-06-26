@@ -25,15 +25,14 @@ local Theme = {
 }
 
 local Kind_Colors = {
-    Info = {Accent = Theme.Accent, Glyph = 'i'},
-    Success = {Accent = Color3.fromRGB(96, 200, 140),  Glyph = '✓'},
-    Warning = {Accent = Color3.fromRGB(230, 188, 64),  Glyph = '!'},
-    Error = {Accent = Color3.fromRGB(220, 90, 100),  Glyph = '✕'}
+    Info = {Accent = Theme.Accent},
+    Success = {Accent = Color3.fromRGB(96, 200, 140)},
+    Warning = {Accent = Color3.fromRGB(230, 188, 64)},
+    Error = {Accent = Color3.fromRGB(220, 90, 100)}
 }
 
 local Text_Font = Enum.Font.Gotham
 local Title_Font = Enum.Font.GothamBold
-local Glyph_Font = Enum.Font.GothamBold
 
 local Device = {
     ['Mobile'] = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled,
@@ -146,36 +145,10 @@ function Module.Notify(Options)
         PaddingRight = UDim.new(0, 14),
     }, Card)
  
-    local Glyph_Badge = Create_Instance('Frame', {
-        Name = 'Glyph',
-        AnchorPoint = Vector2.new(1, 0),
-        Position = UDim2.fromScale(1, 0),
-        Size = UDim2.fromOffset(22, 22),
-        BackgroundColor3 = Theme.Panel_3,
-        BorderSizePixel = 0,
-        ZIndex = 1002,
-    }, Card)
-
-    Create_Corner(Glyph_Badge, 6)
-    local Glyph_Stroke = Create_Stroke(Glyph_Badge, Kind.Accent, 1, 0.5)
- 
-    local Glyph_Text = Create_Instance('TextLabel', {
-        Name = 'Glyph Text',
-        Size = UDim2.fromScale(1, 1),
-        BackgroundTransparency = 1,
-        Font = Glyph_Font,
-        TextSize = 13,
-        Text = Kind.Glyph,
-        TextColor3 = Kind.Accent,
-        TextXAlignment = Enum.TextXAlignment.Center,
-        TextYAlignment = Enum.TextYAlignment.Center,
-        ZIndex = 1003,
-    }, Glyph_Badge)
- 
     local Content = Create_Instance('Frame', {
         Name = 'Content',
         Position = UDim2.fromScale(0, 0),
-        Size = UDim2.new(1, -32, 0, 0),
+        Size = UDim2.new(1, 0, 0, 0),
         AutomaticSize = Enum.AutomaticSize.Y,
         BackgroundTransparency = 1,
         ZIndex = 1002,
@@ -232,7 +205,7 @@ function Module.Notify(Options)
         Name = 'Progress',
         AnchorPoint = Vector2.new(0.5, 1),
         Position = UDim2.new(0.5, 0, 1, 12),
-        Size = UDim2.new(1, -Underline_Inset * 2 + 28, 0, 2),
+        Size = UDim2.new(1, -Underline_Inset * 2, 0, 2),
         BackgroundColor3 = Theme.Border,
         BackgroundTransparency = 0.4,
         BorderSizePixel = 0,
@@ -282,9 +255,6 @@ function Module.Notify(Options)
     Card.Position = UDim2.fromOffset(40, 0)
     Card.BackgroundTransparency = 1
     Card_Stroke.Transparency = 1
-    Glyph_Badge.BackgroundTransparency = 1
-    Glyph_Stroke.Transparency = 1
-    Glyph_Text.TextTransparency = 1
 
     for _, Descendant in ipairs(Content:GetDescendants()) do
         if Descendant:IsA('TextLabel') then
@@ -294,9 +264,6 @@ function Module.Notify(Options)
  
     Create_Tween(Card, 0.26, {Position = UDim2.fromOffset(0, 0), BackgroundTransparency = 0}, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
     Create_Tween(Card_Stroke, 0.26, {Transparency = 0.35})
-    Create_Tween(Glyph_Badge, 0.20, {BackgroundTransparency = 0})
-    Create_Tween(Glyph_Stroke, 0.22, {Transparency = 0.5})
-    Create_Tween(Glyph_Text, 0.22, {TextTransparency = 0})
 
     for _, Descendant in ipairs(Content:GetDescendants()) do
         if Descendant:IsA('TextLabel') then
