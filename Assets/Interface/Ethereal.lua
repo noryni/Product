@@ -63,7 +63,6 @@ end
 
 if getgenv then
     getgenv().Noryn_Loaded = true
-    if getgenv().Config_Enabled == nil then getgenv().Config_Enabled = false end
 end
 
 local Device = {
