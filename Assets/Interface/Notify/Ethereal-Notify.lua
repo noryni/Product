@@ -1,6 +1,7 @@
 if typeof(cloneref) ~= 'function' then return warn('[Product] ─ Dependency Issue. ✨') end
 local UserInputService = cloneref(game:GetService('UserInputService'))
 local TweenService = cloneref(game:GetService('TweenService'))
+local HttpService = cloneref(game:GetService('HttpService'))
 local CoreGui = cloneref(game:GetService('CoreGui'))
 
 local Noryn = CoreGui:FindFirstChild('Noryn')
@@ -37,6 +38,85 @@ local Title_Font = Enum.Font.GothamBold
 local Device = {
     ['Mobile'] = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled,
 }
+
+local Language_Codes = {
+    English = 'en',
+    Spanish = 'es',
+    Chinese = 'zh-cn',
+    Hindi = 'hi',
+    Russian = 'ru',
+    French = 'fr',
+    Portuguese = 'pt',
+    Vietnamese = 'vi',
+    German = 'de',
+    Arabic = 'ar',
+}
+
+local function Http_Request(Options)
+    local Signal = (syn and syn.request) or (http and http.request) or http_request or request
+    if Signal then return Signal(Options) end
+    return HttpService:RequestAsync(Options)
+end
+
+local function Translate_Via_Google(Text, Target_Code, Source_Code)
+    Source_Code = Source_Code or 'auto'
+    local Url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=' .. Source_Code .. '&tl=' .. Target_Code .. '&dt=t&q=' .. HttpService:UrlEncode(Text)
+    local Ok, Result = pcall(function()
+        local Response = Http_Request({Url = Url, Method = 'GET'})
+        local Body = Response.Body or Response.body
+        local Decoded = HttpService:JSONDecode(Body)
+
+        local Combined_Text = ''
+        if Decoded and Decoded[1] then
+            for _, Section in ipairs(Decoded[1]) do
+                if Section[1] then Combined_Text = Combined_Text .. Section[1] end
+            end
+        end
+        return Combined_Text
+    end)
+
+    if Ok and Result and Result ~= '' then
+        return Result
+    end
+    return nil
+end
+
+local function Get_Translate_Type()
+    local Selected = getgenv and getgenv().Notify_Translate_Type_Enabled
+    if type(Selected) ~= 'string' then return 'English' end
+    for Name, _ in pairs(Language_Codes) do
+        if Name:lower() == Selected:lower() then
+            return Name
+        end
+    end
+    return 'English'
+end
+
+local function Is_Translate_Enabled()
+    return getgenv and getgenv().Notify_Translate_Enabled == true
+end
+
+local Translation_Cache = {}
+
+local function Translate_Text(Text)
+    if not Is_Translate_Enabled() then return Text end
+    if type(Text) ~= 'string' or Text == '' then return Text end
+
+    local Target_Language = Get_Translate_Type()
+    if Target_Language == 'English' then return Text end
+
+    local Cache_Key = Target_Language .. '|' .. Text
+    if Translation_Cache[Cache_Key] then
+        return Translation_Cache[Cache_Key]
+    end
+
+    local Translated = Translate_Via_Google(Text, Language_Codes[Target_Language])
+    if Translated then
+        Translation_Cache[Cache_Key] = Translated
+        return Translated
+    end
+    return Text
+end
 
 local function Create_Instance(Class_Name, Properties, Parent)
     local Object = Instance.new(Class_Name)
@@ -106,8 +186,8 @@ local Active_Notifications = {}
 function Module.Notify(Options)
     Options = Options or {}
  
-    local Title = tostring(Options.Title or 'Notification')
-    local Description = tostring(Options.Description or '')
+    local Title = Translate_Text(tostring(Options.Title or 'Notification'))
+    local Description = Translate_Text(tostring(Options.Description or ''))
     local Duration = tonumber(Options.Duration) or 5
     local Kind = Kind_Colors[Options.Kind] or Kind_Colors.Info
     local Notify_Key = Title .. '|' .. Description
