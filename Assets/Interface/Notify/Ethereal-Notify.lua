@@ -249,6 +249,20 @@ end)
 local Order_Counter = 0
 local Active_Notifications = {}
 
+local Tweaks = {
+    ['Notify'] = {
+		['Eh'] = 'rbxassetid://105117264394463',
+		['Huh'] = 'rbxassetid://18548307445',
+		['Uwu'] = 'rbxassetid://124356179581089',
+		['MGS5'] = 'rbxassetid://654933978',
+		['Meow'] = 'rbxassetid://134699420140804',
+		['Moan'] = 'rbxassetid://83299235145654',
+        ['Soft Ping'] = 'rbxassetid://133118130342644',
+		['Windows 8'] = 'rbxassetid://1862045322',
+        ['Old Discord'] = 'rbxassetid://91271439961236'
+    }
+}
+
 function Module.Notify(Options)
     Options = Options or {}
  
@@ -371,6 +385,25 @@ function Module.Notify(Options)
     }, Progress_Track)
     
     Create_Corner(Progress_Fill, 2)
+
+	if Options.Notify ~= false then
+        local Sound_Volume = tonumber(getgenv and getgenv().Notify_Volume_Enabled) or 0.5
+        local Sound_Type = (getgenv and getgenv().Notify_Sound_Type_Enabled) or 'Huh'
+        local Sound_Id = Tweaks.Notify[Sound_Type] or Tweaks.Notify['Huh']
+
+        local Notify_Sound = Create_Instance('Sound', {
+            Name = 'NotifySound',
+            SoundId = Sound_Id,
+            Volume = Sound_Volume * 5,
+            PlayOnRemove = false,
+        }, Card)
+
+        Notify_Sound:Play()
+
+        Notify_Sound.Ended:Connect(function()
+            Notify_Sound:Destroy()
+        end)
+    end
  
     local Dismissed = false
     local Notification_Object
