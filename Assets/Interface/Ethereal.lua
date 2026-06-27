@@ -1251,7 +1251,7 @@ function Library:Set_Lock(State)
             Size = UDim2.fromOffset(64, 64),
             BackgroundTransparency = 1,
             Image = self.Interface['Locked'],
-            ImageColor3 = Theme.Accent,
+            ImageColor3 = Color3.fromRGB(255, 255, 255),
             ImageTransparency = 1,
             Rotation = -90,
             ZIndex = 32,
