@@ -926,17 +926,20 @@ function Library.New()
         end
     end)
 
-    task.spawn(function()
-        local Last_Mode = (getgenv and getgenv().Interface_Mode) or 'Unlocked'
-        while Main_Panel and Main_Panel.Parent do
-            local Current_Mode = (getgenv and getgenv().Interface_Mode) or 'Unlocked'
-            if Current_Mode ~= Last_Mode then
-                self:Set_Lock(Current_Mode == 'Locked')
-                Last_Mode = Current_Mode
-            end
-            task.wait(0.1)
-        end
-    end)
+    local Mode_Debounce = false
+	task.spawn(function()
+    	local Last_Mode = (getgenv and getgenv().Interface_Mode) or 'Unlocked'
+    	while Main_Panel and Main_Panel.Parent do
+        	local Current_Mode = (getgenv and getgenv().Interface_Mode) or 'Unlocked'
+        	if Current_Mode ~= Last_Mode and not Mode_Debounce then
+            	Mode_Debounce = true
+            	self:Set_Lock(Current_Mode == 'Locked')
+            	Last_Mode = Current_Mode
+            	task.delay(0.7, function() Mode_Debounce = false end)
+        	end
+        	task.wait(0.1)
+    	end
+	end)
 
     Main_Panel.GroupTransparency = 1
     task.wait(0.05)
@@ -1203,6 +1206,9 @@ function Library:Set_Lock(State)
     State = State and true or false
     self.Locked = State
 
+    self.Lock_Generation = (self.Lock_Generation or 0) + 1
+    local My_Generation = self.Lock_Generation
+
     if getgenv then getgenv().Interface_Mode = State and 'Locked' or 'Unlocked' end
 
     for _, Button in ipairs(self.Tab_Buttons) do
@@ -1286,6 +1292,7 @@ function Library:Set_Lock(State)
         Create_Tween(Lock_Overlay, 0.40, {BackgroundTransparency = 0.12}, Enum.EasingStyle.Quint)
 
         task.delay(0.10, function()
+            if self.Lock_Generation ~= My_Generation then return end
             if not Lock_Glyph or not Lock_Glyph.Parent then return end
             Create_Tween(Lock_Glyph, 0.20, {ImageTransparency = 0}, Enum.EasingStyle.Quint)
             Create_Tween(Lock_Glyph, 0.55, {
@@ -1293,6 +1300,7 @@ function Library:Set_Lock(State)
                 Size = UDim2.fromOffset(52, 52),
             }, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
             task.delay(0.40, function()
+                if self.Lock_Generation ~= My_Generation then return end
                 if not Lock_Caption or not Lock_Caption.Parent then return end
                 Create_Tween(Lock_Caption, 0.28, {TextTransparency = 0}, Enum.EasingStyle.Quint)
             end)
@@ -1316,26 +1324,30 @@ function Library:Set_Lock(State)
         end
 
         task.delay(0.10, function()
+            if self.Lock_Generation ~= My_Generation then return end
             if not Glyph or not Glyph.Parent then return end
             Glyph.Image = self.Interface['Unlocked']
-			Glyph.ImageColor3 = Color3.new(1, 1, 1)
+            Glyph.ImageColor3 = Color3.new(1, 1, 1)
             Glyph.Rotation = 0
             Glyph.ImageTransparency = 0
             Glyph.Size = UDim2.fromOffset(52, 52)
             Create_Tween(Glyph, 0.25, {Rotation = 180}, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
             Create_Tween(Glyph, 0.20, {Size = UDim2.fromOffset(64, 64)}, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
             task.delay(0.25, function()
+                if self.Lock_Generation ~= My_Generation then return end
                 if not Glyph or not Glyph.Parent then return end
                 Create_Tween(Glyph, 0.25, {ImageTransparency = 1}, Enum.EasingStyle.Quint, Enum.EasingDirection.In)
             end)
         end)
 
         task.delay(0.07, function()
+            if self.Lock_Generation ~= My_Generation then return end
             if not Overlay or not Overlay.Parent then return end
             Create_Tween(Overlay, 0.45, {BackgroundTransparency = 1}, Enum.EasingStyle.Sine)
         end)
 
         task.delay(0.62, function()
+            if self.Lock_Generation ~= My_Generation then return end
             if Overlay and Overlay.Parent then
                 Overlay:Destroy()
             end
