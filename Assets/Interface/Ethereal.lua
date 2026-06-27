@@ -537,7 +537,6 @@ function Library.New()
             ZIndex = 60, 
             AutoButtonColor = false,
         }, Title_Bar)
-
         Create_Corner(Close_Button, 6)
         Create_Stroke(Close_Button, Color3.fromRGB(255, 107, 122), 1, 0.6)
         Close_Button.MouseButton1Click:Connect(function() self:Hide() end)
@@ -705,6 +704,16 @@ function Library.New()
     }, Main_Panel)
 
     self.Body = Body_Scroller
+
+	local Interface = {
+        ['Locked'] = 'rbxassetid://121830702067948',
+        ['Unlocked'] = 'rbxassetid://102151842256737',
+    }
+
+	self.Interface = Interface
+    self.Lock_Overlay = nil
+	self.Lock_Glyph = nil
+	self.Lock_Caption = nil
 
     local Footer = Create_Instance('Frame', {
         Name = 'Status',
@@ -914,6 +923,18 @@ function Library.New()
             Title_Label.Text = Title .. (Dot and '.' or '')
             Dot = not Dot
             task.wait(0.55)
+        end
+    end)
+
+    task.spawn(function()
+        local Last_Mode = (getgenv and getgenv().Interface_Mode) or 'Unlocked'
+        while Main_Panel and Main_Panel.Parent do
+            local Current_Mode = (getgenv and getgenv().Interface_Mode) or 'Unlocked'
+            if Current_Mode ~= Last_Mode then
+                self:Set_Lock(Current_Mode == 'Locked')
+                Last_Mode = Current_Mode
+            end
+            task.wait(0.1)
         end
     end)
 
@@ -1156,6 +1177,14 @@ function Library:Hide()
     end)
 end
 
+function Library:Toggle()
+    if self.Visible then
+        self:Hide()
+    else
+        self:Show()
+    end
+end
+
 function Library:Fade_Float(Visible)
     local Float = self.Float_Button
     if not Float then return end
@@ -1170,8 +1199,152 @@ function Library:Fade_Float(Visible)
     end
 end
 
-function Library:Toggle()
-    if self.Visible then self:Hide() else self:Show() end
+function Library:Set_Lock(State)
+    State = State and true or false
+    self.Locked = State
+
+    if getgenv then getgenv().Interface_Mode = State and 'Locked' or 'Unlocked' end
+
+    for _, Button in ipairs(self.Tab_Buttons) do
+        Button.Active = not State
+    end
+
+    self.Body.ScrollingEnabled = not State
+
+    if self.Search_Input then
+        self.Search_Input.TextEditable = not State
+    end
+
+    if State then
+        if self.Lock_Overlay then
+            self.Lock_Overlay:Destroy()
+            self.Lock_Overlay = nil
+            self.Lock_Glyph = nil
+            self.Lock_Caption = nil
+        end
+
+        local Lock_Overlay = Create_Instance('Frame', {
+            Name = 'Locked',
+            AnchorPoint = Vector2.new(0.5, 0.5),
+            Position = UDim2.fromScale(0.5, 0.5),
+            Size = UDim2.fromOffset(660, 420),
+            BackgroundColor3 = Color3.fromRGB(12, 12, 14),
+            BackgroundTransparency = 1,
+            BorderSizePixel = 0,
+            ZIndex = 20,
+        }, self.Panel)
+
+        Create_Corner(Lock_Overlay, 14)
+
+        Create_Instance('UIGradient', {
+            Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(18, 10, 14)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(8, 8, 10)),
+            }),
+            Rotation = 90,
+        }, Lock_Overlay)
+
+        local Lock_Glyph = Create_Instance('ImageLabel', {
+            Name = 'Glyph',
+            AnchorPoint = Vector2.new(0.5, 0.5),
+            Position = UDim2.fromScale(0.5, 0.44),
+            Size = UDim2.fromOffset(64, 64),
+            BackgroundTransparency = 1,
+            Image = self.Interface['Locked'],
+            ImageColor3 = Theme.Accent,
+            ImageTransparency = 1,
+            Rotation = -90,
+            ZIndex = 32,
+        }, Lock_Overlay)
+
+        local Lock_Caption = Create_Instance('TextLabel', {
+            AnchorPoint = Vector2.new(0.5, 0),
+            Position = UDim2.new(0.5, 0, 0.44, 28),
+            Size = UDim2.fromOffset(200, 18),
+            BackgroundTransparency = 1,
+            Font = Enum.Font.Code,
+            TextSize = 12,
+            Text = 'Interface Locked',
+            TextColor3 = Theme.Accent,
+            TextTransparency = 1,
+            ZIndex = 32,
+        }, Lock_Overlay)
+
+        Create_Instance('TextButton', {
+            Name = 'Shield',
+            Size = UDim2.fromScale(1, 1),
+            BackgroundTransparency = 1,
+            Text = '',
+            ZIndex = 33,
+            AutoButtonColor = false,
+        }, Lock_Overlay)
+
+        self.Lock_Overlay = Lock_Overlay
+        self.Lock_Glyph = Lock_Glyph
+        self.Lock_Caption = Lock_Caption
+
+        Create_Tween(Lock_Overlay, 0.40, {BackgroundTransparency = 0.12}, Enum.EasingStyle.Quint)
+
+        task.delay(0.10, function()
+            if not Lock_Glyph or not Lock_Glyph.Parent then return end
+            Create_Tween(Lock_Glyph, 0.20, {ImageTransparency = 0}, Enum.EasingStyle.Quint)
+            Create_Tween(Lock_Glyph, 0.55, {
+                Rotation = 0,
+                Size = UDim2.fromOffset(52, 52),
+            }, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+            task.delay(0.40, function()
+                if not Lock_Caption or not Lock_Caption.Parent then return end
+                Create_Tween(Lock_Caption, 0.28, {TextTransparency = 0}, Enum.EasingStyle.Quint)
+            end)
+        end)
+    else
+        local Glyph = self.Lock_Glyph
+        local Caption = self.Lock_Caption
+        local Overlay = self.Lock_Overlay
+
+        if not Overlay then
+            self:Status('Interface unlocked', Theme.Accent, 1.6)
+            return
+        end
+
+        self.Lock_Overlay = nil
+        self.Lock_Glyph = nil
+        self.Lock_Caption = nil
+
+        if Caption then
+            Create_Tween(Caption, 0.18, {TextTransparency = 1}, Enum.EasingStyle.Quint)
+        end
+
+        task.delay(0.10, function()
+            if not Glyph or not Glyph.Parent then return end
+            Glyph.Image = self.Interface['Unlocked']
+            Glyph.Rotation = 0
+            Glyph.ImageTransparency = 0
+            Glyph.Size = UDim2.fromOffset(52, 52)
+            Create_Tween(Glyph, 0.25, {Rotation = 180}, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
+            Create_Tween(Glyph, 0.20, {Size = UDim2.fromOffset(64, 64)}, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+            task.delay(0.25, function()
+                if not Glyph or not Glyph.Parent then return end
+                Create_Tween(Glyph, 0.25, {ImageTransparency = 1}, Enum.EasingStyle.Quint, Enum.EasingDirection.In)
+            end)
+        end)
+
+        task.delay(0.07, function()
+            if not Overlay or not Overlay.Parent then return end
+            Create_Tween(Overlay, 0.45, {BackgroundTransparency = 1}, Enum.EasingStyle.Sine)
+        end)
+
+        task.delay(0.62, function()
+            if Overlay and Overlay.Parent then
+                Overlay:Destroy()
+            end
+        end)
+    end
+
+    self:Status(
+        State and 'Interface locked' or 'Interface unlocked',
+        State and Color3.fromRGB(230, 188, 64) or Theme.Accent, 1.6
+    )
 end
 
 function Library:Toggle_Minimize()
@@ -1277,14 +1450,17 @@ function Library:Create_Tab(Name, Icon)
     Tab_Button.MouseEnter:Connect(function()
         if self.Active_Tab ~= Tab_Index then Create_Tween(Tab_Button, 0.12, {TextColor3 = Theme.Muted}) end
     end)
+
     Tab_Button.MouseLeave:Connect(function()
         if self.Active_Tab ~= Tab_Index then Create_Tween(Tab_Button, 0.12, {TextColor3 = Theme.Dim}) end
     end)
 
     table.insert(self.Tab_Buttons, Tab_Button)
     self.Tab_Icons[Tab_Index] = (Icon and Icon ~= '') and Tab_Button.Content.Icon or nil
-    local Captured_Index = Tab_Index
-    Tab_Button.MouseButton1Click:Connect(function()
+    
+	local Captured_Index = Tab_Index
+    
+	Tab_Button.MouseButton1Click:Connect(function()
         if self.Search_Input and self.Search_Input.Text ~= '' then self.Search_Input.Text = '' end
         self:Switch_Tab(Captured_Index)
     end)
@@ -1355,6 +1531,7 @@ function Library:Create_Tab(Name, Icon)
         if Section == 'right' then return Right_Column end
         return Left_Column
     end
+	
     local function Next_Order(Section)
         if Section == 'right' then Order_Right += 1; return Order_Right end
         Order_Left += 1; return Order_Left
