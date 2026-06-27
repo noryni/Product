@@ -163,22 +163,88 @@ local Screen_Gui = Create_Instance('ScreenGui', {
 local Container_Width = 300
 local Edge_Margin = Device['Mobile'] and 12 or 16
 
+local Position_Map = {
+    ['Down-Right'] = {
+        Anchor = Vector2.new(1, 1),
+        Position = UDim2.new(1, -Edge_Margin, 1, -Edge_Margin),
+        List_Vertical = Enum.VerticalAlignment.Bottom
+    },
+    ['Down-Left']  = {
+        Anchor = Vector2.new(0, 1),
+        Position = UDim2.new(0,  Edge_Margin, 1, -Edge_Margin),
+        List_Vertical = Enum.VerticalAlignment.Bottom
+    },
+    ['Up-Right']   = {
+        Anchor = Vector2.new(1, 0),
+        Position = UDim2.new(1, -Edge_Margin, 0,  Edge_Margin),
+        List_Vertical = Enum.VerticalAlignment.Top
+    },
+    ['Up-Left']    = {
+        Anchor = Vector2.new(0, 0),
+        Position = UDim2.new(0,  Edge_Margin, 0,  Edge_Margin),
+        List_Vertical = Enum.VerticalAlignment.Top
+    },
+    ['Down-Center'] = {
+        Anchor = Vector2.new(0.5, 1),
+        Position = UDim2.new(0.5, 0, 1, -Edge_Margin),
+        List_Vertical = Enum.VerticalAlignment.Bottom
+    },
+    ['Up-Center'] = {
+        Anchor = Vector2.new(0.5, 0),
+        Position = UDim2.new(0.5, 0, 0, Edge_Margin),
+        List_Vertical = Enum.VerticalAlignment.Top
+    },
+    ['Mid-Left'] = {
+        Anchor = Vector2.new(0, 0.5),
+        Position = UDim2.new(0, Edge_Margin, 0.5, 0),
+        List_Vertical = Enum.VerticalAlignment.Center
+    },
+    ['Mid-Right'] = {
+        Anchor = Vector2.new(1, 0.5),
+        Position = UDim2.new(1, -Edge_Margin, 0.5, 0),
+        List_Vertical = Enum.VerticalAlignment.Center
+    },
+}
+
+local function Get_Position()
+    local Selected = getgenv and getgenv().Notify_Position_Enabled
+    return Position_Map[Selected] or Position_Map['Down-Right']
+end
+
+local Initial_Pos = Get_Position()
+
 local Container = Create_Instance('Frame', {
     Name = 'Container',
-    AnchorPoint = Vector2.new(1, 1),
-    Position = UDim2.new(1, -Edge_Margin, 1, -Edge_Margin),
+    AnchorPoint = Initial_Pos.Anchor,
+    Position = Initial_Pos.Position,
     Size = UDim2.fromOffset(Container_Width, 0),
     AutomaticSize = Enum.AutomaticSize.Y,
     BackgroundTransparency = 1,
     ZIndex = 1000,
 }, Screen_Gui)
 
-Create_Instance('UIListLayout', {
+local List_Layout = Create_Instance('UIListLayout', {
     Padding = UDim.new(0, 8),
     SortOrder = Enum.SortOrder.LayoutOrder,
     HorizontalAlignment = Enum.HorizontalAlignment.Right,
-    VerticalAlignment = Enum.VerticalAlignment.Bottom,
+    VerticalAlignment = Initial_Pos.List_Vertical,
 }, Container)
+
+local Last_Position_Key = getgenv and getgenv().Notify_Position_Enabled or 'Down-Right'
+
+task.spawn(function()
+    while Container and Container.Parent do
+        local Current_Key = getgenv and getgenv().Notify_Position_Enabled or 'Down-Right'
+        if Current_Key ~= Last_Position_Key then
+            local New_Pos = Position_Map[Current_Key] or Position_Map['Down-Right']
+            Last_Position_Key = Current_Key
+            Container.AnchorPoint = New_Pos.Anchor
+            List_Layout.VerticalAlignment = New_Pos.List_Vertical
+            Create_Tween(Container, 0.35, {Position = New_Pos.Position}, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+        end
+        task.wait(0.1)
+    end
+end)
 
 local Order_Counter = 0
 local Active_Notifications = {}
