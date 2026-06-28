@@ -93,7 +93,7 @@ local Theme = {
 
 local Raw_Connections = {}
 
-local Connection = setmetatable({}, {
+Connection = setmetatable({}, {
     __newindex = function(_, Key, Value)
         if Raw_Connections[Key] then
             pcall(function() Raw_Connections[Key]:Disconnect() end)
