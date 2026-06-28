@@ -1958,6 +1958,20 @@ function Library:Create_Tab(Name, Icon)
             PaddingBottom = UDim.new(0, 3),
         }, List)
 
+		local Empty_Label = Create_Instance('TextLabel', {
+            Name = 'Empty State',
+            AnchorPoint = Vector2.new(0.5, 0.5),
+            Position = UDim2.fromScale(0.5, 0.5),
+            Size = UDim2.new(1, -16, 0, 18),
+            BackgroundTransparency = 1,
+            Font = Enum.Font.Code,
+            TextSize = 12,
+            Text = 'Server is empty',
+            TextColor3 = Theme.Dim,
+            Visible = true,
+            ZIndex = 17,
+        }, List)
+
         local Rows = {}
         local Selected_User_Id = nil
         local Initialized = false
@@ -1975,6 +1989,10 @@ function Library:Create_Tab(Name, Icon)
 
         local function Update_Count()
             Count_Label.Text = 'Online: ' .. tostring(#Players:GetPlayers())
+        end
+
+		local function Update_Empty_State()
+            Empty_Label.Visible = next(Rows) == nil
         end
 
         local function Render_Row_State(Row_Data, Is_Selected, Animate)
@@ -2110,6 +2128,7 @@ function Library:Create_Tab(Name, Icon)
 
             Sort_Rows()
             Update_Count()
+            Update_Empty_State()
 
             if Animate then
                 Row_Data.Row.Size = UDim2.new(1, 0, 0, 0)
@@ -2140,6 +2159,7 @@ function Library:Create_Tab(Name, Icon)
 
             Rows[Player.UserId] = nil
             Update_Count()
+            Update_Empty_State()
 
             if Selected_User_Id == Player.UserId then
                 self.Flags[Flag] = Saved_User_Id
@@ -2179,6 +2199,7 @@ function Library:Create_Tab(Name, Icon)
         end
 
         Update_Count()
+        Update_Empty_State()
 
         Connection['Added' .. Flag] = Players.PlayerAdded:Connect(function(Player) Add_Player(Player, true) end)
         Connection['Removed' .. Flag] = Players.PlayerRemoving:Connect(function(Player) Remove_Player(Player, true) end)
