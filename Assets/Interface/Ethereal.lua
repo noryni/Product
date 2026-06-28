@@ -1322,7 +1322,7 @@ function Library:Set_Lock(State)
             Position = UDim2.new(0.5, 0, 0.44, 28),
             Size = UDim2.fromOffset(200, 18),
             BackgroundTransparency = 1,
-            Font = Enum.Font.Code,
+            FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold),
             TextSize = 12,
             Text = 'Interface Locked',
             TextColor3 = Theme.Accent,
