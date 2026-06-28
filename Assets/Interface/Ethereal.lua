@@ -26,10 +26,12 @@ if typeof(cloneref) ~= 'function' then return warn('[Product] ─ Dependency Iss
 local UserInputService = cloneref(game:GetService('UserInputService'))
 local TweenService = cloneref(game:GetService('TweenService'))
 local RunService = cloneref(game:GetService('RunService'))
+local Workspace = cloneref(game:GetService('Workspace'))
 local CoreGui = cloneref(game:GetService('CoreGui'))
 local Players = cloneref(game:GetService('Players'))
 
 local Local_Player = Players.LocalPlayer
+local Camera = Workspace.CurrentCamera
 local Place_Id = game.PlaceId
 
 local Library = {
@@ -329,6 +331,42 @@ function Library.New()
 
     Create_Corner(Main_Panel, 14)
     self.Panel = Main_Panel
+
+	local Interface_Scale = Create_Instance('UIScale', {
+    	Scale = 1,
+	}, Main_Panel)
+
+	self.Interface_Scale = Interface_Scale
+
+	local function Update_Interface_Scale(Instant)
+    	if not Camera then return end
+    	local Viewport_Y = Camera.ViewportSize.Y
+    	local Target_Scale = math.clamp(Viewport_Y / 1080, 1, 1.6)
+
+    	if Instant then
+        	Interface_Scale.Scale = Target_Scale
+    	else
+        	Create_Tween(Interface_Scale, 0.3, {Scale = Target_Scale}, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+    	end
+	end
+
+	Update_Interface_Scale(true)
+
+	Connection.Viewport_Scale = Workspace:GetPropertyChangedSignal('CurrentCamera'):Connect(function()
+    	Camera = Workspace.CurrentCamera
+    	Update_Interface_Scale(true)
+    	if Camera then
+        	Connection.Viewport_Resize = Camera:GetPropertyChangedSignal('ViewportSize'):Connect(function()
+            	Update_Interface_Scale(false)
+        	end)
+    	end
+	end)
+
+	if Camera then
+    	Connection.Viewport_Resize = Camera:GetPropertyChangedSignal('ViewportSize'):Connect(function()
+        	Update_Interface_Scale(false)
+    	end)
+	end
 
     local Title_Bar = Create_Instance('Frame', {
         Name = 'Top',
@@ -1169,7 +1207,7 @@ function Library:Hide()
     self.Minimize_Button.Text, self.Minimized = '▴  Expand', true
     Create_Tween(self.Panel, 0.22, {Size = UDim2.fromOffset(660, 92)})
     task.delay(0.26, function()
-        Create_Tween(self.Panel, 0.20, {GroupTransparency = 1 })
+        Create_Tween(self.Panel, 0.20, {GroupTransparency = 1})
         task.delay(0.22, function()
             self.Panel.Visible = false
             if self.Float_Button then 
