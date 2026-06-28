@@ -93,7 +93,7 @@ local Theme = {
 
 local Raw_Connections = {}
 
-Connection = setmetatable({}, {
+local Connection = setmetatable({}, {
     __newindex = function(_, Key, Value)
         if Raw_Connections[Key] then
             pcall(function() Raw_Connections[Key]:Disconnect() end)
@@ -322,7 +322,7 @@ function Library.New()
         Name = 'Panel',
         AnchorPoint = Vector2.new(0.5, 0.5),
         Position = UDim2.fromScale(0.5, 0.5),
-        Size = UDim2.fromOffset(660, 420),
+        Size = UDim2.fromOffset(700, 450),
         BackgroundColor3 = Theme.Panel,
         BorderSizePixel = 0,
         GroupTransparency = 1,
@@ -537,7 +537,7 @@ function Library.New()
         Position = UDim2.fromOffset(52, 0), 
         Size = UDim2.new(0, 300, 1, 0),
         BackgroundTransparency = 1, 
-        Font = Enum.Font.Code, 
+        FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold), 
         TextSize = 20,
         Text = Title, 
         TextColor3 = Theme.Accent, 
@@ -553,7 +553,7 @@ function Library.New()
         Position = UDim2.fromOffset(120, 0), 
         Size = UDim2.new(0, 80, 1, 0),
         BackgroundTransparency = 1, 
-        Font = Enum.Font.Code, 
+        FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold), 
         TextSize = 13,
         Text = Version, 
         TextColor3 = Color3.fromRGB(100, 75, 80),
@@ -568,7 +568,7 @@ function Library.New()
             Size = UDim2.fromOffset(34, 28), 
             BackgroundColor3 = Color3.fromRGB(18, 14, 15),
             BorderSizePixel = 0, 
-            Font = Enum.Font.Code, 
+            FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold), 
             TextSize = 14, 
             Text = '✕',
             TextColor3 = Color3.fromRGB(255, 107, 122), 
@@ -586,7 +586,8 @@ function Library.New()
         Position = UDim2.new(1, Device['Mobile'] and -56 or -14, 0.5, 0),
         Size = UDim2.fromOffset(72, 26), 
         BackgroundColor3 = Theme.Panel_2,
-        BorderSizePixel = 0, Font = Enum.Font.Code, 
+        BorderSizePixel = 0, 
+		FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold), 
         TextSize = 12, Text = '▾  Min',
         TextColor3 = Theme.Muted, 
         ZIndex = 60, 
@@ -664,16 +665,14 @@ function Library.New()
 
     local Search_Stroke = Create_Stroke(Search_Box, Theme.Border, 1, 0.5)
 
-    Create_Instance('TextLabel', {
-        Name = 'Glyph',
-        AnchorPoint = Vector2.new(0, 0.5), 
-        Position = UDim2.new(0, 10, 0.5, 0),
-        Size = UDim2.fromOffset(16, 16), 
+	local Search_Icon = Create_Instance('ImageLabel', {
+        Name = 'Icon',
+        Size = UDim2.fromOffset(18, 18),
+        Position = UDim2.new(0.00999999978, 0, 0.100000001, 0),
         BackgroundTransparency = 1,
-        Font = Enum.Font.Code, 
-        TextSize = 13, 
-        Text = '⌕', 
-        TextColor3 = Theme.Dim, 
+        Image = 'rbxassetid://17441620727',
+        ImageColor3 = Color3.fromRGB(45, 45, 52),
+        LayoutOrder = 1,
         ZIndex = 13,
     }, Search_Box)
 
@@ -682,7 +681,7 @@ function Library.New()
         Position = UDim2.fromOffset(30, 0), 
         Size = UDim2.new(1, -64, 1, 0),
         BackgroundTransparency = 1, 
-        Font = Enum.Font.Code, 
+        FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold),
         TextSize = 12,
         Text = '', 
         PlaceholderText = 'Search features...', 
@@ -711,11 +710,13 @@ function Library.New()
     }, Search_Box)
 
     Search_Input.Focused:Connect(function() 
-        Create_Tween(Search_Stroke, 0.12, {Color = Theme.Accent, Transparency = 0}) 
+        Create_Tween(Search_Stroke, 0.3, {Color = Theme.Border, Transparency = 0.3}) 
+        Create_Tween(Search_Icon, 0.3, {ImageColor3 = Theme.Accent})
     end)
 
     Search_Input.FocusLost:Connect(function() 
-        Create_Tween(Search_Stroke, 0.12, {Color = Theme.Border, Transparency = 0.3}) 
+        Create_Tween(Search_Stroke, 0.3, {Color = Theme.Border, Transparency = 0.3}) 
+        Create_Tween(Search_Icon, 0.3, {ImageColor3 = Color3.fromRGB(45, 45, 52)})
     end)
 
     Search_Input:GetPropertyChangedSignal('Text'):Connect(function()
@@ -1005,6 +1006,9 @@ end
 function Library:Search(Query)
     Query = tostring(Query or ''):lower():gsub('^%s*(.-)%s*$', '%1')
 
+    self.Search_Generation = (self.Search_Generation or 0) + 1
+    local My_Generation = self.Search_Generation
+
     if Query == '' then
         self.Searching = false
         for _, Item in ipairs(self.Search_Items) do
@@ -1024,7 +1028,12 @@ function Library:Search(Query)
     end
 
     if First_Match_Tab and First_Match_Tab ~= self.Active_Tab then
-        self:Switch_Tab(First_Match_Tab)
+        task.delay(0.18, function()
+            if self.Search_Generation ~= My_Generation then return end
+            if not self.Search_Input then return end
+            if self.Search_Input.Text:lower():gsub('^%s*(.-)%s*$', '%1') ~= Query then return end
+            self:Switch_Tab(First_Match_Tab)
+        end)
     end
 end
 
@@ -1067,6 +1076,9 @@ function Library:Switch_Tab(Index)
 	end
 
     self.Switching = true
+    self.Switch_Generation = (self.Switch_Generation or 0) + 1
+    local My_Switch_Generation = self.Switch_Generation
+
     local Out_Pane = self.Tabs[self.Active_Tab]
     local In_Pane = self.Tabs[Index]
 
@@ -1078,6 +1090,7 @@ function Library:Switch_Tab(Index)
 
     local Previous = self.Active_Tab
     task.delay(0.16, function()
+        if self.Switch_Generation ~= My_Switch_Generation then return end
         if self.Tabs[Previous] and Previous ~= self.Active_Tab then
             self.Tabs[Previous].Visible = false
             self.Tabs[Previous].Position = UDim2.fromScale(0, 0)
@@ -1091,7 +1104,10 @@ function Library:Switch_Tab(Index)
                 Descendant:SetAttribute('Replay', tick())
             end
         end
-        task.delay(0.28, function() self.Switching = false end)
+        task.delay(0.28, function()
+            if self.Switch_Generation ~= My_Switch_Generation then return end
+            self.Switching = false
+        end)
     end)
 
     for Tab_Index, Button in ipairs(self.Tab_Buttons) do
@@ -1184,7 +1200,7 @@ function Library:Show()
     self.Tweening = true
     if self.Float_Button then self:Fade_Float(false) end
     self.Panel.Visible, self.Panel.GroupTransparency = true, 1
-    self.Panel.Size = UDim2.fromOffset(660, 92)
+    self.Panel.Size = UDim2.fromOffset(700, 92)
     self.Body.Visible, self.Footer.Visible = false, false
     self.Minimize_Button.Text, self.Minimized = '▴  Expand', true
     Create_Tween(self.Panel, 0.22, {GroupTransparency = 0})
@@ -1192,7 +1208,7 @@ function Library:Show()
         self.Minimized = false
         self.Body.Visible, self.Footer.Visible = true, true
         self.Minimize_Button.Text = '▾  Min'
-        Create_Tween(self.Panel, 0.30, {Size = UDim2.fromOffset(660, 420)})
+        Create_Tween(self.Panel, 0.30, {Size = UDim2.fromOffset(700, 450)})
         task.delay(0.32, function() 
             self.Tweening = false 
         end)
@@ -1205,7 +1221,7 @@ function Library:Hide()
     self.Tweening, self.Visible = true, false
     self.Body.Visible, self.Footer.Visible = false, false
     self.Minimize_Button.Text, self.Minimized = '▴  Expand', true
-    Create_Tween(self.Panel, 0.22, {Size = UDim2.fromOffset(660, 92)})
+    Create_Tween(self.Panel, 0.22, {Size = UDim2.fromOffset(700, 92)})
     task.delay(0.26, function()
         Create_Tween(self.Panel, 0.20, {GroupTransparency = 1})
         task.delay(0.22, function()
@@ -1271,7 +1287,7 @@ function Library:Set_Lock(State)
             Name = 'Locked',
             AnchorPoint = Vector2.new(0.5, 0.5),
             Position = UDim2.fromScale(0.5, 0.5),
-            Size = UDim2.fromOffset(660, 420),
+            Size = UDim2.fromOffset(700, 450),
             BackgroundColor3 = Color3.fromRGB(12, 12, 14),
             BackgroundTransparency = 1,
             BorderSizePixel = 0,
@@ -1405,7 +1421,7 @@ function Library:Toggle_Minimize()
     	self.Minimize_Sound:Play()
 	end
     self.Minimized = not self.Minimized
-    Create_Tween(self.Panel, 0.28, {Size = UDim2.fromOffset(660, self.Minimized and 92 or 420)})
+    Create_Tween(self.Panel, 0.28, {Size = UDim2.fromOffset(700, self.Minimized and 92 or 450)})
     self.Body.Visible, self.Footer.Visible = not self.Minimized, not self.Minimized
     self.Minimize_Button.Text = self.Minimized and '▴  Expand' or '▾  Min'
 end
@@ -1421,7 +1437,7 @@ function Library:Create_Tab(Name, Icon)
         AutomaticSize = Enum.AutomaticSize.X,
         BackgroundColor3 = Color3.fromRGB(30, 16, 20),
         BackgroundTransparency = Is_First and 0 or 1, BorderSizePixel = 0,
-        Font = Enum.Font.Code, 
+        FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold), 
         TextSize = 13, 
         Text = Name,
         TextColor3 = Is_First and Theme.Accent or Theme.Dim,
@@ -1471,7 +1487,7 @@ function Library:Create_Tab(Name, Icon)
             Size = UDim2.fromOffset(0, 16),
             AutomaticSize = Enum.AutomaticSize.X,
             BackgroundTransparency = 1,
-            Font = Enum.Font.Code,
+            FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold),
             TextSize = 13,
             Text = Name,
             TextColor3 = Is_First and Theme.Accent or Theme.Dim,
@@ -1629,7 +1645,8 @@ function Library:Create_Tab(Name, Icon)
             AutomaticSize = Enum.AutomaticSize.X, 
             Size = UDim2.fromOffset(0, 18),
             BackgroundTransparency = 1, 
-            Font = Enum.Font.Code, TextSize = 14,
+            FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold), 
+			TextSize = 14,
             Text = Name, 
             TextColor3 = Theme.Text, 
             LayoutOrder = 1, 
@@ -1642,7 +1659,7 @@ function Library:Create_Tab(Name, Icon)
                 AutomaticSize = Enum.AutomaticSize.X, 
                 Size = UDim2.fromOffset(0, 16),
                 BackgroundColor3 = Badge_Color.Background, 
-                Font = Enum.Font.Code, 
+                FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold), 
                 TextSize = 10,
                 Text = Badge, 
                 TextColor3 = Badge_Color.Text, 
@@ -1678,7 +1695,7 @@ function Library:Create_Tab(Name, Icon)
             Name = 'Title',
             Size = UDim2.new(1, 0, 0, 24), 
             BackgroundTransparency = 1,
-            Font = Enum.Font.Code, 
+            FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold), 
             TextSize = 13, 
             Text = Options.name or '',
             TextColor3 = Theme.Accent, 
@@ -1693,7 +1710,7 @@ function Library:Create_Tab(Name, Icon)
         local Label = Create_Instance('TextLabel', {
             Size = UDim2.new(1, 0, 0, 20), 
             BackgroundTransparency = 1,
-            Font = Enum.Font.Code, 
+            FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold), 
             TextSize = 11, Text = Options.name or '',
             TextColor3 = Theme.Dim, 
             TextXAlignment = Enum.TextXAlignment.Left,
@@ -1749,7 +1766,8 @@ function Library:Create_Tab(Name, Icon)
             AutomaticSize = Enum.AutomaticSize.X, 
             Size = UDim2.fromOffset(0, 18),
             BackgroundTransparency = 1, 
-            Font = Enum.Font.Code, TextSize = 14,
+            FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold), 
+			TextSize = 14,
             Text = Options.title or '', 
             TextColor3 = Theme.Accent,
             TextXAlignment = Enum.TextXAlignment.Left, 
@@ -1762,7 +1780,7 @@ function Library:Create_Tab(Name, Icon)
                 AutomaticSize = Enum.AutomaticSize.X, 
                 Size = UDim2.fromOffset(0, 16),
                 BackgroundColor3 = Badge_Color.Background, 
-                Font = Enum.Font.Code, 
+                FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold), 
                 TextSize = 10,
                 Text = Options.badge, 
                 TextColor3 = Badge_Color.Text, 
@@ -1778,7 +1796,7 @@ function Library:Create_Tab(Name, Icon)
             Size = UDim2.new(1, 0, 0, 0), 
             AutomaticSize = Enum.AutomaticSize.Y,
             BackgroundTransparency = 1, 
-            Font = Enum.Font.Code, 
+            FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold), 
             TextSize = 12,
             Text = Options.content or '', 
             TextColor3 = Theme.Muted,
@@ -1909,7 +1927,7 @@ function Library:Create_Tab(Name, Icon)
             AnchorPoint = Vector2.new(0, 0),
             Size = UDim2.fromOffset(160, 18),
             BackgroundTransparency = 1,
-            Font = Enum.Font.Code,
+            FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold),
             TextSize = 14,
             Text = Options.name or 'Players',
             TextColor3 = Theme.Text,
@@ -1922,7 +1940,7 @@ function Library:Create_Tab(Name, Icon)
             Position = UDim2.new(1, 0, 0, 0),
             Size = UDim2.fromOffset(140, 18),
             BackgroundTransparency = 1,
-            Font = Enum.Font.Code,
+            FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold),
             TextSize = 12,
             Text = 'Online: 0',
             TextColor3 = Theme.Dim,
@@ -1964,7 +1982,7 @@ function Library:Create_Tab(Name, Icon)
             Position = UDim2.fromScale(0.5, 0.5),
             Size = UDim2.new(1, -16, 0, 18),
             BackgroundTransparency = 1,
-            Font = Enum.Font.Code,
+            FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold),
             TextSize = 12,
             Text = 'Server is empty',
             TextColor3 = Theme.Dim,
@@ -2064,7 +2082,7 @@ function Library:Create_Tab(Name, Icon)
                 Position = UDim2.fromOffset(8, 0),
                 Size = UDim2.new(1, -18, 1, 0),
                 BackgroundTransparency = 1,
-                Font = Enum.Font.Code,
+                FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold),
                 TextSize = 12,
                 Text = Player.DisplayName ~= Player.Name and (Player.DisplayName .. ' (' .. Player.Name .. ')') or Player.Name,
                 TextColor3 = Theme.Dim,
@@ -2253,7 +2271,7 @@ function Library:Create_Tab(Name, Icon)
                 Position = UDim2.fromOffset(14, 30), 
                 Size = UDim2.fromOffset(300, 14),
                 BackgroundTransparency = 1, 
-                Font = Enum.Font.Code, 
+                FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold), 
                 TextSize = 11,
                 Text = Options.info or '',
                 TextColor3 = Theme.Dim,
@@ -2269,7 +2287,7 @@ function Library:Create_Tab(Name, Icon)
             Size = UDim2.fromOffset(76, 26), 
             BackgroundColor3 = Color3.fromRGB(34, 18, 22),
             BorderSizePixel = 0, 
-            Font = Enum.Font.Code, 
+            FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold), 
             TextSize = 12, 
             Text = '▸ Run',
             TextColor3 = Theme.Accent, 
@@ -2320,7 +2338,7 @@ function Library:Create_Tab(Name, Icon)
                 Position = UDim2.fromOffset(14, 30), 
                 Size = UDim2.fromOffset(300, 14),
                 BackgroundTransparency = 1, 
-                Font = Enum.Font.Code, 
+                FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold), 
                 TextSize = 11,
                 Text = Options.info or '', 
                 TextColor3 = Theme.Dim,
@@ -2430,7 +2448,7 @@ function Library:Create_Tab(Name, Icon)
             Position = UDim2.new(1, -14, 0, 9),
             Size = UDim2.fromOffset(120, 18), 
             BackgroundTransparency = 1,
-            Font = Enum.Font.Code, 
+            FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold), 
             TextSize = 13, 
             Text = '',
             TextColor3 = Theme.Accent, 
@@ -2560,7 +2578,7 @@ function Library:Create_Tab(Name, Icon)
         	Size = UDim2.fromOffset(140, 28), 
         	BackgroundColor3 = Theme.Not_Enabled,
         	BorderSizePixel = 0, 
-       	 	Font = Enum.Font.Code, 
+       	 	FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold), 
         	TextSize = 12,
         	Text = '', 
         	TextColor3 = Theme.Text, 
@@ -2575,7 +2593,7 @@ function Library:Create_Tab(Name, Icon)
         	Position = UDim2.fromOffset(10, 0), 
         	Size = UDim2.new(1, -34, 1, 0),
         	BackgroundTransparency = 1, 
-        	Font = Enum.Font.Code, 
+        	FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold), 
         	TextSize = 12,
         	Text = tostring(Default), 
         	TextColor3 = Theme.Text,
@@ -2589,7 +2607,7 @@ function Library:Create_Tab(Name, Icon)
         	Position = UDim2.new(1, -8, 0.5, 0),
         	Size = UDim2.fromOffset(14, 14), 
         	BackgroundTransparency = 1,
-        	Font = Enum.Font.Code, 
+        	FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold), 
         	TextSize = 12,
         	Text = '▾', 
         	TextColor3 = Theme.Muted, 
@@ -2663,7 +2681,7 @@ function Library:Create_Tab(Name, Icon)
                 BackgroundColor3 = Theme.Panel,
                 BackgroundTransparency = 1, 
                 BorderSizePixel = 0, 
-                Font = Enum.Font.Code,
+                FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold),
                 TextSize = 12, 
                 Text = '   ' .. tostring(Choice),
                 TextColor3 = (Choice == Default) and Theme.Accent or Theme.Muted,
@@ -2727,7 +2745,7 @@ function Library:Create_Tab(Name, Icon)
             Size = UDim2.fromOffset(120, 28), 
             BackgroundColor3 = Theme.Not_Enabled,
             BorderSizePixel = 0, 
-            Font = Enum.Font.Code, 
+            FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold), 
             TextSize = 12,
             Text = Key_Text(Default), 
             TextColor3 = Theme.Text, 
@@ -2825,7 +2843,7 @@ function Library:Create_Tab(Name, Icon)
             Size = UDim2.fromOffset(0, 20),
             AutomaticSize = Enum.AutomaticSize.X,
             BackgroundTransparency = 1,
-            Font = Enum.Font.Code,
+            FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold),
             TextSize = 11,
             Text = Options.name or '',
             TextColor3 = Options.color or Theme.Dim,
@@ -2873,7 +2891,7 @@ function Library:Create_Tab(Name, Icon)
                 Position = UDim2.fromOffset(14, 30),
                 Size = UDim2.fromOffset(200, 14),
                 BackgroundTransparency = 1,
-                Font = Enum.Font.Code,
+                FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold),
                 TextSize = 11,
                 Text = Options.info or '',
                 TextColor3 = Theme.Dim,
@@ -2899,7 +2917,7 @@ function Library:Create_Tab(Name, Icon)
             Position = UDim2.fromOffset(8, 0),
             Size = UDim2.new(1, -16, 1, 0),
             BackgroundTransparency = 1,
-            Font = Enum.Font.Code,
+            FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold),
             TextSize = 12,
             Text = Default,
             PlaceholderText = Options.placeholder or 'Enter text...',
@@ -2993,7 +3011,7 @@ function Library:Create_Tab(Name, Icon)
             Position = UDim2.new(1, -60, 0, 12),
             Size = UDim2.fromOffset(14, 18),
             BackgroundTransparency = 1,
-            Font = Enum.Font.Code,
+            FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold),
             TextSize = 12,
             Text = '▾',
             TextColor3 = Theme.Muted,
