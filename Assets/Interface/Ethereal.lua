@@ -125,6 +125,22 @@ function Library:clear()
     end
 end
 
+function Library:Destroy()
+    self:clear()
+    self.Flags = {}
+    self.Control_Objects = {}
+    self.Tabs = {}
+    self.Tab_Buttons = {}
+    self.Tab_Icons = {}
+    self.Search_Items = {}
+    self.Visible = false
+    self.Minimized = false
+    self.Tweening = false
+    if getgenv then
+        getgenv().Noryn_Loaded = false
+    end
+end
+
 local Badge_Colors = {
     Hot = {
         Background = Color3.fromRGB(50, 20, 25), 
@@ -561,34 +577,50 @@ function Library.New()
         ZIndex = 12,
     }, Title_Bar)
 
-    if Device['Mobile'] then
-        local Close_Button = Create_Instance('TextButton', {
-            AnchorPoint = Vector2.new(1, 0.5), 
-            Position = UDim2.new(1, -14, 0.5, 0),
-            Size = UDim2.fromOffset(34, 28), 
-            BackgroundColor3 = Color3.fromRGB(18, 14, 15),
-            BorderSizePixel = 0, 
-            FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold), 
-            TextSize = 14, 
-            Text = '✕',
-            TextColor3 = Color3.fromRGB(255, 107, 122), 
-            ZIndex = 60, 
-            AutoButtonColor = false,
-        }, Title_Bar)
-        Create_Corner(Close_Button, 6)
-        Create_Stroke(Close_Button, Color3.fromRGB(255, 107, 122), 1, 0.6)
-        Close_Button.MouseButton1Click:Connect(function() self:Hide() end)
-    end
+    if not Device['Mobile'] then
+    	local Close_Button = Create_Instance('ImageButton', {
+    		Name = 'Close',
+    		AnchorPoint = Vector2.new(1, 0.5),
+    		Position = UDim2.new(1, -14, 0.5, 0),
+    		Size = UDim2.fromOffset(34, 28),
+    		BackgroundColor3 = Color3.fromRGB(18, 14, 15),
+    		BorderSizePixel = 0,
+    		Image = '',
+    		ZIndex = 60,
+    		AutoButtonColor = false,
+		}, Title_Bar)
+
+		Create_Stroke(Close_Button, Theme.Border, 1, 0.8)
+		Create_Corner(Close_Button, 6)
+
+		local Close_Icon = Create_Instance('ImageLabel', {
+    		Name = 'Icon',
+    		AnchorPoint = Vector2.new(0.5, 0.5),
+    		Position = UDim2.fromScale(0.5, 0.5),
+    		Size = UDim2.fromOffset(16, 16),
+    		BackgroundTransparency = 1,
+    		Image = 'rbxassetid://17440865331',
+    		ImageColor3 = Theme.Accent,
+    		ZIndex = 61,
+		}, Close_Button)
+
+		self.Close_Icon = Close_Icon
+
+		Close_Button.MouseButton1Click:Connect(function()
+    		self:Hide()
+		end)
+	end
 
     local Minimize_Button = Create_Instance('TextButton', {
         Name = 'Minimize',
         AnchorPoint = Vector2.new(1, 0.5),
-        Position = UDim2.new(1, Device['Mobile'] and -56 or -14, 0.5, 0),
+        Position = UDim2.new(1, not Device['Mobile'] and -56 or -14, 0.5, 0),
         Size = UDim2.fromOffset(72, 26), 
         BackgroundColor3 = Theme.Panel_2,
         BorderSizePixel = 0, 
 		FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold), 
-        TextSize = 12, Text = '▾  Min',
+        TextSize = 12, 
+        Text = '▼  Min',
         TextColor3 = Theme.Muted, 
         ZIndex = 60, 
         AutoButtonColor = false,
@@ -610,6 +642,55 @@ function Library.New()
 
     Minimize_Button.MouseLeave:Connect(function() 
         Create_Tween(Minimize_Button, 0.12, {BackgroundColor3 = Theme.Panel_2, TextColor3 = Theme.Muted}) 
+    end)
+
+    local Panic_Button = Create_Instance('ImageButton', {
+        Name = 'Panic',
+        AnchorPoint = Vector2.new(1, 0.5),
+        Position = UDim2.new(1, not Device['Mobile'] and -134 or -92, 0.5, 0),
+        Size = UDim2.fromOffset(30, 26),
+        BackgroundColor3 = Theme.Panel_2,
+        BorderSizePixel = 0,
+        Image = '',
+        ZIndex = 60,
+        AutoButtonColor = false,
+    }, Title_Bar)
+
+    Create_Corner(Panic_Button, 6)
+    Create_Stroke(Panic_Button, Theme.Border, 1, 0.8)
+
+    local Panic_Icon = Create_Instance('ImageLabel', {
+        Name = 'Icon',
+        AnchorPoint = Vector2.new(0.5, 0.5),
+        Position = UDim2.fromScale(0.5, 0.5),
+        Size = UDim2.fromOffset(16, 16),
+        BackgroundTransparency = 1,
+        Image = 'rbxassetid://113158216827345',
+        ImageColor3 = Color3.fromRGB(144, 144, 160),
+        ZIndex = 61,
+    }, Panic_Button)
+
+    self.Panic_Icon = Panic_Icon
+
+    local Default_Color = Color3.fromRGB(144, 144, 160)
+
+    Panic_Button.MouseEnter:Connect(function()
+        Create_Tween(Panic_Icon, 0.3, {
+            ImageColor3 = Theme.Accent
+        })
+    end)
+
+    Panic_Button.MouseLeave:Connect(function()
+        Create_Tween(Panic_Icon, 0.3, {
+            ImageColor3 = Default_Color
+        })
+    end)
+
+    Panic_Button.MouseButton1Click:Connect(function()
+        getgenv().Interface_Mode = 'Locked'
+		task.wait(1)
+        self:Destroy_Interface()
+        getgenv().Interface_Mode = 'Unlocked'
     end)
 
     local Tab_Bar = Create_Instance('ScrollingFrame', {
@@ -702,7 +783,7 @@ function Library.New()
         BackgroundTransparency = 1,
         Font = Enum.Font.Code, 
         TextSize = 13, 
-        Text = '✕', 
+        Text = 'X', 
         TextColor3 = Theme.Dim,
         Visible = false, 
         ZIndex = 13, 
@@ -835,8 +916,8 @@ function Library.New()
     self.Status_Dot = Status_Dot
 
 	task.spawn(function()
-        if not self.Status_Dot then return end
-        while self.Status_Dot and self.Status_Dot.Parent do
+    	if not self.Status_Dot then return end
+    	while self.Status_Dot and self.Status_Dot.Parent do
             local In = TweenService:Create(self.Status_Dot, TweenInfo.new(0.6, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
                 BackgroundTransparency = 0.35
             })
@@ -878,7 +959,7 @@ function Library.New()
         ZIndex = 14,
     }, Footer)
 
-    if Device['Mobile'] then
+    if not Device['Mobile'] then
         local Float_Button = Create_Instance('ImageButton', {
             Name = 'Mobile', 
             AnchorPoint = Vector2.new(0.5, 1),
@@ -886,7 +967,7 @@ function Library.New()
             Size = UDim2.fromOffset(70, 35),
             BackgroundColor3 = Color3.fromRGB(18, 10, 12), 
             BorderSizePixel = 0,
-            Image = 'rbxassetid://131149619650660',
+            Image = 'rbxassetid://18782883071',
             ImageColor3 = Theme.Accent,
             ImageTransparency = 1,
             ScaleType = Enum.ScaleType.Fit,
@@ -896,6 +977,7 @@ function Library.New()
             AutoButtonColor = false,
         }, Screen_Gui)
 
+		Create_Stroke(Float_Button, Theme.Border, 1, 0.8)
         Create_Corner(Float_Button, 8)
 
         self.Float_Button = Float_Button
@@ -1202,12 +1284,12 @@ function Library:Show()
     self.Panel.Visible, self.Panel.GroupTransparency = true, 1
     self.Panel.Size = UDim2.fromOffset(700, 92)
     self.Body.Visible, self.Footer.Visible = false, false
-    self.Minimize_Button.Text, self.Minimized = '▴  Expand', true
+    self.Minimize_Button.Text, self.Minimized = '▲  Expand', true
     Create_Tween(self.Panel, 0.22, {GroupTransparency = 0})
     task.delay(0.26, function()
         self.Minimized = false
         self.Body.Visible, self.Footer.Visible = true, true
-        self.Minimize_Button.Text = '▾  Min'
+        self.Minimize_Button.Text = '▼  Min'
         Create_Tween(self.Panel, 0.30, {Size = UDim2.fromOffset(700, 450)})
         task.delay(0.32, function() 
             self.Tweening = false 
@@ -1220,7 +1302,7 @@ function Library:Hide()
     if self.Tweening then return end
     self.Tweening, self.Visible = true, false
     self.Body.Visible, self.Footer.Visible = false, false
-    self.Minimize_Button.Text, self.Minimized = '▴  Expand', true
+    self.Minimize_Button.Text, self.Minimized = '▲  Expand', true
     Create_Tween(self.Panel, 0.22, {Size = UDim2.fromOffset(700, 92)})
     task.delay(0.26, function()
         Create_Tween(self.Panel, 0.20, {GroupTransparency = 1})
@@ -1423,7 +1505,49 @@ function Library:Toggle_Minimize()
     self.Minimized = not self.Minimized
     Create_Tween(self.Panel, 0.28, {Size = UDim2.fromOffset(700, self.Minimized and 92 or 450)})
     self.Body.Visible, self.Footer.Visible = not self.Minimized, not self.Minimized
-    self.Minimize_Button.Text = self.Minimized and '▴  Expand' or '▾  Min'
+    self.Minimize_Button.Text = self.Minimized and '▲  Expand' or '▼  Min'
+end
+
+function Library:Destroy_Interface(Callback)
+    if not self:exist() then
+        self:Destroy()
+        if Callback then pcall(Callback) end
+        return
+    end
+
+    if self.Tweening then
+        task.delay(0.32, function() self:Destroy_Interface(Callback) end)
+        return
+    end
+
+    self.Tweening = true
+    Clear_All_Connections()
+
+	if self.Body then self.Body.Visible = false end
+    if self.Footer then self.Footer.Visible = false end
+    if self.Minimize_Button then self.Minimize_Button.Text = '▲  Expand' end
+
+    Create_Tween(self.Panel, 0.38, {
+        Position = self.Panel.Position - UDim2.fromOffset(0, 18),
+        GroupTransparency = 1,
+    }, Enum.EasingStyle.Quint, Enum.EasingDirection.In)
+
+    Create_Tween(self.Interface_Scale, 0.38, {
+        Scale = self.Interface_Scale.Scale * 0.88,
+    }, Enum.EasingStyle.Quint, Enum.EasingDirection.In)
+
+    if self.Float_Button then
+        Create_Tween(self.Float_Button, 0.22, {
+            BackgroundTransparency = 1,
+            ImageTransparency = 1,
+        }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+    end
+
+    task.delay(0.40, function()
+        self.Tweening = false
+        self:Destroy()
+        if Callback then pcall(Callback) end
+    end)
 end
 
 function Library:Create_Tab(Name, Icon)
@@ -1711,7 +1835,8 @@ function Library:Create_Tab(Name, Icon)
             Size = UDim2.new(1, 0, 0, 20), 
             BackgroundTransparency = 1,
             FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold), 
-            TextSize = 11, Text = Options.name or '',
+            TextSize = 11, 
+            Text = Options.name or '',
             TextColor3 = Theme.Dim, 
             TextXAlignment = Enum.TextXAlignment.Left,
             LayoutOrder = Next_Order(Options.section), 
@@ -1831,10 +1956,10 @@ function Library:Create_Tab(Name, Icon)
 
         Create_Instance('UIGradient', {
             Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, Color3.fromRGB(12, 12, 14)),   
-            ColorSequenceKeypoint.new(0.15, Options.color or Color3.fromRGB(203, 104, 118)),
-            ColorSequenceKeypoint.new(0.85, Options.color or Color3.fromRGB(203, 104, 118)),
-            ColorSequenceKeypoint.new(1, Color3.fromRGB(12, 12, 14)), 
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(12, 12, 14)),   
+                ColorSequenceKeypoint.new(0.15, Options.color or Color3.fromRGB(203, 104, 118)),
+                ColorSequenceKeypoint.new(0.85, Options.color or Color3.fromRGB(203, 104, 118)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(12, 12, 14)), 
             }),
             Transparency = NumberSequence.new(0),
             Rotation = 0,
@@ -1892,8 +2017,8 @@ function Library:Create_Tab(Name, Icon)
         Create_Instance('UIGradient', {
             Rotation = 90,
             Transparency = NumberSequence.new({
-            NumberSequenceKeypoint.new(0, 1),
-            NumberSequenceKeypoint.new(1, 0),
+                NumberSequenceKeypoint.new(0, 1),
+                NumberSequenceKeypoint.new(1, 0),
             }),
         }, Fade)
 
@@ -2289,7 +2414,7 @@ function Library:Create_Tab(Name, Icon)
             BorderSizePixel = 0, 
             FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold), 
             TextSize = 12, 
-            Text = '▸ Run',
+            Text = '▶  Run',
             TextColor3 = Theme.Accent, 
             ZIndex = 18, 
             AutoButtonColor = false,
@@ -2609,7 +2734,7 @@ function Library:Create_Tab(Name, Icon)
         	BackgroundTransparency = 1,
         	FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold), 
         	TextSize = 12,
-        	Text = '▾', 
+        	Text = '▼', 
         	TextColor3 = Theme.Muted, 
         	ZIndex = 18,
     	}, Box)
@@ -3013,7 +3138,7 @@ function Library:Create_Tab(Name, Icon)
             BackgroundTransparency = 1,
             FontFace = Font.new('rbxasset://fonts/families/Montserrat.json', Enum.FontWeight.SemiBold),
             TextSize = 12,
-            Text = '▾',
+            Text = '▼',
             TextColor3 = Theme.Muted,
             ZIndex = 17,
         }, Row)
@@ -3132,7 +3257,7 @@ function Library:Create_Tab(Name, Icon)
 
         local function Set_Open(State_Open)
             Is_Open = State_Open
-            Icon.Text = Is_Open and '▴' or '▾'
+            Icon.Text = Is_Open and '▲' or '▼'
             Create_Tween(Icon, 0.16, {TextColor3 = Is_Open and Theme.Accent or Theme.Muted})
             Create_Tween(Picker, 0.22, {Size = UDim2.new(1, -28, 0, Is_Open and 110 or 0)})
             Create_Tween(Row, 0.24, {Size = UDim2.new(1, 0, 0, Is_Open and (46 + 110 + 8) or 46)})
