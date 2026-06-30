@@ -599,7 +599,7 @@ function Library.New()
     		Position = UDim2.fromScale(0.5, 0.5),
     		Size = UDim2.fromOffset(16, 16),
     		BackgroundTransparency = 1,
-    		Image = 'rbxassetid://17440865331',
+    		Image = 'rbxassetid://7733771982',
     		ImageColor3 = Theme.Accent,
     		ZIndex = 61,
 		}, Close_Button)
@@ -967,7 +967,7 @@ function Library.New()
             Size = UDim2.fromOffset(70, 35),
             BackgroundColor3 = Color3.fromRGB(18, 10, 12), 
             BorderSizePixel = 0,
-            Image = 'rbxassetid://18782883071',
+            Image = 'rbxassetid://7743875962',
             ImageColor3 = Theme.Accent,
             ImageTransparency = 1,
             ScaleType = Enum.ScaleType.Fit,
@@ -977,7 +977,6 @@ function Library.New()
             AutoButtonColor = false,
         }, Screen_Gui)
 
-		Create_Stroke(Float_Button, Theme.Border, 1, 0.8)
         Create_Corner(Float_Button, 8)
 
         self.Float_Button = Float_Button
