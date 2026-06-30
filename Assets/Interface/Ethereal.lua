@@ -665,7 +665,7 @@ function Library.New()
         Position = UDim2.fromScale(0.5, 0.5),
         Size = UDim2.fromOffset(16, 16),
         BackgroundTransparency = 1,
-        Image = 'rbxassetid://113158216827345',
+        Image = 'rbxassetid://7734052653',
         ImageColor3 = Color3.fromRGB(144, 144, 160),
         ZIndex = 61,
     }, Panic_Button)
